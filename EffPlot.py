@@ -1,6 +1,8 @@
 import ROOT
 from ROOT import gROOT
 from ROOT import gStyle
+from ROOT import TF1
+from ROOT import kRed 
 ROOT.gROOT.SetBatch(True)  # go into batch mode, stop trying to actively popup graphics on the screen
 from subprocess import call
 import string, re
@@ -9,6 +11,13 @@ import sys
 
 inputname = "EffStudy.root"
 inputfile = ROOT.TFile.Open( inputname )
+
+#gStyle.SetStatX(0.92)
+#gStyle.SetStatY(0.92)
+#gStyle.SetOptStat("emr")
+#gStyle.SetOptFit(1111)
+
+
 
 h_cutflow = inputfile.Get("cutflow")
 #h_trk_eta = inputfile.Get("trk_eta_org")
@@ -29,6 +38,34 @@ h_overlap = inputfile.Get("overlap")
 h_eff_phi = inputfile.Get("eff_phi")
 h_eff_eta = inputfile.Get("eff_eta")
 h2_eff_channel = inputfile.Get("eff_channel")
+
+h_eff_phi_noStuck = inputfile.Get("eff_phi_noStuck")
+h_eff_eta_noStuck = inputfile.Get("eff_eta_noStuck")
+
+h2_eff_channel_onlyNumerator = inputfile.Get("eff_channel_numerator")
+
+for i in range(-16,17):
+	for j in range(1,5):
+		myhist = inputfile.Get("qsum_sector_%d_layer_%d" % (i, j))
+		if myhist == None: continue
+		myc= ROOT.TCanvas("myc", "myc", 800, 600)
+		myc.SetMargin(0.15,0.075,0.15,0.075)
+		myhist.SetStats(ROOT.kFALSE)
+		myhist.SetTitle("sector %d, layer %d" % (i, j))
+		myhist.GetYaxis().SetTitle("Events")
+		myhist.GetYaxis().SetTitleOffset(1.4)
+		myhist.GetYaxis().SetTitleSize(0.04)
+		myhist.GetXaxis().SetTitle("qsum")
+		myhist.Draw()
+#        fit_x = TF1("fit_x", "landau", 0., 10000000.)
+#		fit_x = TF1("fit_x", "landau", 0., 5000000.)
+#		fit_x.SetLineColor(kRed)
+#		myhist.Fit("fit_x")
+		myc.Update()
+		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.eps" % (i,j))
+		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.png" % (i,j))
+		myc.Close()
+
 
 myc= ROOT.TCanvas("myc", "myc", 800, 600)
 myc.SetMargin(0.12,0.05,0.1,0.05)
@@ -310,6 +347,29 @@ myc.Close()
 
 myc= ROOT.TCanvas("myc", "myc", 1200, 600)
 myc.SetMargin(0.06,0.03,0.1,0.05)
+h_eff_phi_noStuck.SetStats(ROOT.kFALSE)
+h_eff_phi_noStuck.SetTitle("")
+h_eff_phi_noStuck.SetMaximum(1.)
+h_eff_phi_noStuck.SetFillColor(ROOT.kRed-9)
+h_eff_phi_noStuck.SetLineColor(ROOT.kRed+2)
+h_eff_phi_noStuck.GetXaxis().SetTitle("Sector number")
+h_eff_phi_noStuck.GetXaxis().SetNdivisions(134)
+h_eff_phi_noStuck.GetYaxis().SetTitle("Phi Efficiency")
+h_eff_phi_noStuck.GetYaxis().SetTitleOffset(0.7)
+h_eff_phi_noStuck.GetYaxis().SetTitleSize(0.04)
+h_eff_phi_noStuck.Draw("HIST")
+myc.Update()
+error_eff_phi_noStuck = ROOT.TGraphAsymmErrors(h_eff_phi_noStuck)
+error_eff_phi_noStuck.SetFillStyle(3001)
+error_eff_phi_noStuck.SetFillColor(ROOT.kRed+2)
+error_eff_phi_noStuck.Draw("2 SAME")
+myc.Update()
+myc.SaveAs("effplots/h_eff_phi_noStuck.eps")
+myc.SaveAs("effplots/h_eff_phi_noStuck.png")
+myc.Close()
+
+myc= ROOT.TCanvas("myc", "myc", 1200, 600)
+myc.SetMargin(0.06,0.03,0.1,0.05)
 h_eff_eta.SetStats(ROOT.kFALSE)
 h_eff_eta.SetTitle("")
 h_eff_eta.SetMaximum(1.)
@@ -329,6 +389,29 @@ error_eff_eta.Draw("2 SAME")
 myc.Update()
 myc.SaveAs("effplots/h_eff_eta.eps")
 myc.SaveAs("effplots/h_eff_eta.png")
+myc.Close()
+
+myc= ROOT.TCanvas("myc", "myc", 1200, 600)
+myc.SetMargin(0.06,0.03,0.1,0.05)
+h_eff_eta_noStuck.SetStats(ROOT.kFALSE)
+h_eff_eta_noStuck.SetTitle("")
+h_eff_eta_noStuck.SetMaximum(1.)
+h_eff_eta_noStuck.SetFillColor(ROOT.kRed-9)
+h_eff_eta_noStuck.SetLineColor(ROOT.kRed+2)
+h_eff_eta_noStuck.GetXaxis().SetTitle("Sector number")
+h_eff_eta_noStuck.GetXaxis().SetNdivisions(134)
+h_eff_eta_noStuck.GetYaxis().SetTitle("Eta Efficiency")
+h_eff_eta_noStuck.GetYaxis().SetTitleOffset(0.7)
+h_eff_eta_noStuck.GetYaxis().SetTitleSize(0.04)
+h_eff_eta_noStuck.Draw("HIST")
+myc.Update()
+error_eff_eta_noStuck = ROOT.TGraphAsymmErrors(h_eff_eta_noStuck)
+error_eff_eta_noStuck.SetFillStyle(3001)
+error_eff_eta_noStuck.SetFillColor(ROOT.kRed+2)
+error_eff_eta_noStuck.Draw("2 SAME")
+myc.Update()
+myc.SaveAs("effplots/h_eff_eta_noStuck.eps")
+myc.SaveAs("effplots/h_eff_eta_noStuck.png")
 myc.Close()
 
 # set the palette to make range close to 1 more sensitive
@@ -363,3 +446,38 @@ myc.Update()
 myc.SaveAs("effplots/h2_eff_channel.eps")
 myc.SaveAs("effplots/h2_eff_channel.png")
 myc.Close()
+
+myc= ROOT.TCanvas("myc", "myc", 1000, 800)
+myc.SetMargin(0.08,0.15,0.1,0.03)
+h2_eff_channel_onlyNumerator.SetStats(ROOT.kFALSE)
+h2_eff_channel_onlyNumerator.SetTitle("")
+h2_eff_channel_onlyNumerator.GetXaxis().SetTitle("Channel number [GeV]")
+h2_eff_channel_onlyNumerator.GetYaxis().SetTitle("Sector number")
+h2_eff_channel_onlyNumerator.GetYaxis().SetTitleOffset(0.9)
+h2_eff_channel_onlyNumerator.GetYaxis().SetTitleSize(0.04)
+h2_eff_channel_onlyNumerator.GetZaxis().SetTitle("Hits")
+h2_eff_channel_onlyNumerator.GetZaxis().SetTitleOffset(1.3)
+h2_eff_channel_onlyNumerator.Draw("COLZ0")
+myc.Update()
+myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.eps")
+myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.png")
+myc.Close()
+
+
+'''
+myc= ROOT.TCanvas("myc", "myc", 800, 600)
+myc.SetMargin(0.12,0.05,0.1,0.05)
+h_qsum.SetStats(ROOT.kFALSE)
+h_qsum.SetTitle("")
+h_qsum.GetXaxis().SetTitle("qsum")
+h_qsum.GetYaxis().SetTitle("Number of hits")
+h_qsum.GetYaxis().SetTitleOffset(1.4)
+h_qsum.GetYaxis().SetTitleSize(0.04)
+h_qsum.Draw()
+myc.Update()
+myc.SaveAs("effplots/h_qsum.eps")
+myc.SaveAs("effplots/h_qsum.png")
+myc.Close()
+'''
+
+
