@@ -3,6 +3,9 @@ from ROOT import gROOT
 from ROOT import gStyle
 from ROOT import TF1
 from ROOT import kRed 
+from ROOT import TPaveText 
+from ROOT import TPaveStats
+from ROOT import TLatex
 ROOT.gROOT.SetBatch(True)  # go into batch mode, stop trying to actively popup graphics on the screen
 from subprocess import call
 import string, re
@@ -12,10 +15,10 @@ import sys
 inputname = "EffStudy.root"
 inputfile = ROOT.TFile.Open( inputname )
 
-#gStyle.SetStatX(0.92)
-#gStyle.SetStatY(0.92)
-#gStyle.SetOptStat("emr")
-#gStyle.SetOptFit(1111)
+gStyle.SetStatX(0.92)
+gStyle.SetStatY(0.92)
+gStyle.SetOptFit(11)
+gStyle.SetOptStat(0)
 
 
 
@@ -38,6 +41,7 @@ h_overlap = inputfile.Get("overlap")
 h_eff_phi = inputfile.Get("eff_phi")
 h_eff_eta = inputfile.Get("eff_eta")
 h2_eff_channel = inputfile.Get("eff_channel")
+#h2_eff_channel_modified = inputfile.Get("eff_channel_modified")
 
 h_eff_phi_noStuck = inputfile.Get("eff_phi_noStuck")
 h_eff_eta_noStuck = inputfile.Get("eff_eta_noStuck")
@@ -48,20 +52,24 @@ for i in range(-16,17):
 	for j in range(1,5):
 		myhist = inputfile.Get("qsum_sector_%d_layer_%d" % (i, j))
 		if myhist == None: continue
+#		gStyle.SetOptFit(1)
+#		gStyle.SetOptStat(1111)
 		myc= ROOT.TCanvas("myc", "myc", 800, 600)
 		myc.SetMargin(0.15,0.075,0.15,0.075)
-		myhist.SetStats(ROOT.kFALSE)
+#		myhist.SetStats(ROOT.kFALSE)
 		myhist.SetTitle("sector %d, layer %d" % (i, j))
 		myhist.GetYaxis().SetTitle("Events")
 		myhist.GetYaxis().SetTitleOffset(1.4)
 		myhist.GetYaxis().SetTitleSize(0.04)
 		myhist.GetXaxis().SetTitle("qsum")
 		myhist.Draw()
-#        fit_x = TF1("fit_x", "landau", 0., 10000000.)
-#		fit_x = TF1("fit_x", "landau", 0., 5000000.)
-#		fit_x.SetLineColor(kRed)
-#		myhist.Fit("fit_x")
+
+		fit_x = TF1("fit_x", "landau", 0., 6000000.)
+		fit_x.SetLineColor(kRed)
+		myhist.Fit("fit_x")
+
 		myc.Update()
+
 		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.eps" % (i,j))
 		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.png" % (i,j))
 		myc.Close()
@@ -463,21 +471,20 @@ myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.eps")
 myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.png")
 myc.Close()
 
-
 '''
-myc= ROOT.TCanvas("myc", "myc", 800, 600)
-myc.SetMargin(0.12,0.05,0.1,0.05)
-h_qsum.SetStats(ROOT.kFALSE)
-h_qsum.SetTitle("")
-h_qsum.GetXaxis().SetTitle("qsum")
-h_qsum.GetYaxis().SetTitle("Number of hits")
-h_qsum.GetYaxis().SetTitleOffset(1.4)
-h_qsum.GetYaxis().SetTitleSize(0.04)
-h_qsum.Draw()
+myc= ROOT.TCanvas("myc", "myc", 1000, 800)
+myc.SetMargin(0.08,0.15,0.1,0.03)
+h2_eff_channel_modified.SetStats(ROOT.kFALSE)
+h2_eff_channel_modified.SetTitle("")
+h2_eff_channel_modified.GetXaxis().SetTitle("Channel number [GeV]")
+h2_eff_channel_modified.GetYaxis().SetTitle("Sector number")
+h2_eff_channel_modified.GetYaxis().SetTitleOffset(0.9)
+h2_eff_channel_modified.GetYaxis().SetTitleSize(0.04)
+h2_eff_channel_modified.GetZaxis().SetTitle("Hits")
+h2_eff_channel_modified.GetZaxis().SetTitleOffset(1.3)
+h2_eff_channel_modified.Draw("COLZ0")
 myc.Update()
-myc.SaveAs("effplots/h_qsum.eps")
-myc.SaveAs("effplots/h_qsum.png")
+myc.SaveAs("effplots/h2_eff_channel_modified.eps")
+myc.SaveAs("effplots/h2_eff_channel_modified.png")
 myc.Close()
 '''
-
-

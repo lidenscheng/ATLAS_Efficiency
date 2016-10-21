@@ -3,7 +3,8 @@
 #include <TH2.h>
 #include <TF1.h>
 #include <TMath.h>
-#include "TStyle.h"
+#include <TStyle.h>
+#include <TImage.h> 
 #include <iostream>
 #include <vector>
 #include <fstream> 
@@ -51,20 +52,20 @@ void EffStudy::Loop()
    vector<Long_t> n_trkpersec_noStuck; // number of matched trks per sector when we take out stuck bits, eff denominator
 
    vector<vector<vector<Long_t>>> n_trkperchl; // number of matched trks per channel, eff denominator
-   vector<vector<vector<Long_t>>> n_trkperchl_modified; // used to count for the case of ignoring ch 1-48 
+//   vector<vector<vector<Long_t>>> n_trkperchl_modified; // used to count for the case of ignoring ch 1-48 
 
    n_trkpersec.resize(33, 0); // magic number 33=16+16+1, 16 sectors on each end, the extra 1 is for convenience filling histogram
    n_trkpersec_noStuck.resize(33, 0); 
 
    n_trkperchl.resize(33);
-   n_trkperchl_modified.resize(33);
+//   n_trkperchl_modified.resize(33);
 
    for(UInt_t i=0; i<n_trkperchl.size(); ++i) {
       n_trkperchl[i].resize(4); // 4 layers per sector
-      n_trkperchl_modified[i].resize(4); 
+//      n_trkperchl_modified[i].resize(4); 
       for(UInt_t j=0; j<n_trkperchl[i].size(); ++j) {
 		 n_trkperchl[i][j].resize(241, 0); // magic number 242=48+192+1, 48 phi channels, 192 eta channels, 1 for convenience
-		 n_trkperchl_modified[i][j].resize(241, 0);
+//		 n_trkperchl_modified[i][j].resize(241, 0);
 		}
    }
 
@@ -375,14 +376,14 @@ void EffStudy::Loop()
 
             for(UInt_t j=0; j<layer_eta.size(); ++j) {
                if( layer_eta[j]==0 ) 
-//					++n_trkperchl[sector_2ndary+16][j][avgchlphi+48];
+//					++n_trkperchl[sector_2ndary+16][j][avgchlphi+48]; //the bug is here; YZ had avgchlphi instead of avgchleta here 
 					++n_trkperchl[sector_2ndary+16][j][avgchleta+48];
 
          	}
 
 /*            for(UInt_t j=0; j<layer_eta_modified.size(); ++j) {
                if( layer_eta_modified[j]==0 ) 
-					++n_trkperchl_modified[sector_2ndary+16][j][avgchlphi_modified+48];
+					++n_trkperchl_modified[sector_2ndary+16][j][avgchleta_modified+48];
 
          	}
 */
@@ -456,6 +457,9 @@ void EffStudy::Loop()
       
          TH1F *myhist = ((TH1F *)(HList->FindObject(histoname)));
 
+//   gStyle->SetOptFit(0);
+//   gStyle->SetOptStat(1100);
+
          if (!myhist)
          {
 //          	myhist = new TH1F(histoname, histoname; "qsum";;, 100, 0., 10000000.);
@@ -464,6 +468,7 @@ void EffStudy::Loop()
          } // if (!myhist) ...
       
       	 myhist->Fill(hit_qsum->at(i));
+// 		 gStyle->SetOptStat();
 //		 myhist->Fit("landau"); 
 //		 HList.push_back(myhist); 
 
@@ -483,13 +488,18 @@ void EffStudy::Loop()
 //	(HList[i])->Fit("landau"); 
 //}
 
+/*
 TH1F *source = (TH1F*)HList->First();
 while(source)
 {
-	source->Fit("landau"); 
+	source->Draw(); 
+
+	source->Fit("landau");
+
+	gStyle->SetOptFit(111);
 	source = (TH1F*)(HList->After(source));
 }
-
+*/
 
 //cout << "total events: " << Long64_t(h_cutflow->GetBinContent(1)) << endl; 
 //cout << "good trk index: " << Long64_t(h_cutflow->GetBinContent(2)) << endl;
