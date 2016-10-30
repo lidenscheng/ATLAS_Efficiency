@@ -1,11 +1,15 @@
 import ROOT
 from ROOT import gROOT
 from ROOT import gStyle
+from ROOT import gPad 
 from ROOT import TF1
-from ROOT import kRed 
+from ROOT import kRed, kBlue, kViolet, kBlack, kGreen 
 from ROOT import TPaveText 
 from ROOT import TPaveStats
 from ROOT import TLatex
+from ROOT import TLegend 
+from ROOT import TGraph 
+from ROOT import TMultiGraph 
 ROOT.gROOT.SetBatch(True)  # go into batch mode, stop trying to actively popup graphics on the screen
 from subprocess import call
 import string, re
@@ -15,12 +19,11 @@ import sys
 inputname = "EffStudy.root"
 inputfile = ROOT.TFile.Open( inputname )
 
-gStyle.SetStatX(0.92)
-gStyle.SetStatY(0.92)
-gStyle.SetOptFit(11)
-gStyle.SetOptStat(0)
-
-
+#gStyle.SetStatX(0.92)
+#gStyle.SetStatY(0.92)
+#gStyle.SetOptStat("emr")
+#gStyle.SetOptFit(11)
+#gStyle.SetOptStat(0)
 
 h_cutflow = inputfile.Get("cutflow")
 #h_trk_eta = inputfile.Get("trk_eta_org")
@@ -38,26 +41,51 @@ h2_trk_P_eta_1 = inputfile.Get("trk_P_eta_1")
 h2_trk_P_phi_1 = inputfile.Get("trk_P_phi_1")
 h2_trk_eta_phi_1 = inputfile.Get("trk_eta_phi_1")
 h_overlap = inputfile.Get("overlap")
+
 h_eff_phi = inputfile.Get("eff_phi")
 h_eff_eta = inputfile.Get("eff_eta")
-h2_eff_channel = inputfile.Get("eff_channel")
-#h2_eff_channel_modified = inputfile.Get("eff_channel_modified")
 
 h_eff_phi_noStuck = inputfile.Get("eff_phi_noStuck")
 h_eff_eta_noStuck = inputfile.Get("eff_eta_noStuck")
 
+h_eff_phi_good = inputfile.Get("eff_phi_good")
+h_eff_eta_good = inputfile.Get("eff_eta_good")
+
+h2_eff_channel = inputfile.Get("eff_channel")
 h2_eff_channel_onlyNumerator = inputfile.Get("eff_channel_numerator")
+#h2_eff_channel_modified = inputfile.Get("eff_channel_modified")
+
+#h_mpv = inputfile.Get("most_prob_hist") 
+
+#h_eff_sector10_layer1 = inputfile.Get("eff_sector10_layer1") 
+#h_eff_sector10_layer2 = inputfile.Get("eff_sector10_layer2") 
+#h_eff_sector10_layer3 = inputfile.Get("eff_sector10_layer3") 
+#h_eff_sector10_layer4 = inputfile.Get("eff_sector10_layer4") 
+
+layers = []
+mpv = []
 
 for i in range(-16,17):
 	for j in range(1,5):
 		myhist = inputfile.Get("qsum_sector_%d_layer_%d" % (i, j))
-		if myhist == None: continue
-#		gStyle.SetOptFit(1)
-#		gStyle.SetOptStat(1111)
+#		myhist = inputfile.Get("qsum_layer_%f" % (i+0.25*(j-1.0)))
+		if myhist == None: 
+			layer= i+0.25*(j-1.0) 
+			layers.append(float(layer))
+			mpv.append(0.0) 
+#			print "sector_%d, layer_%d" % (i,j), 0.0 
+#			print 0.0 
+			continue
+		gStyle.SetOptFit(11)
+		gStyle.SetOptStat(0)
+
+		layer= i+0.25*(j-1.0) 
+		layers.append(float(layer))
+
 		myc= ROOT.TCanvas("myc", "myc", 800, 600)
 		myc.SetMargin(0.15,0.075,0.15,0.075)
-#		myhist.SetStats(ROOT.kFALSE)
-		myhist.SetTitle("sector %d, layer %d" % (i, j))
+#		myhist.SetTitle("Layer %f" % layer)
+		myhist.SetTitle("Sector_%d, Layer_%d" % (i,j))
 		myhist.GetYaxis().SetTitle("Events")
 		myhist.GetYaxis().SetTitleOffset(1.4)
 		myhist.GetYaxis().SetTitleSize(0.04)
@@ -68,11 +96,81 @@ for i in range(-16,17):
 		fit_x.SetLineColor(kRed)
 		myhist.Fit("fit_x")
 
+#		print 'MPV unscaled:',fit_x.GetParameter(1)
+#		print 'Sigma unscaled:',fit_x.GetParameter(2)
+		mpv.append(fit_x.GetParameter(1)) 
+#		print "sector_%d, layer_%d" % (i,j), fit_x.GetParameter(1)
+#		print fit_x.GetParameter(1)
+
 		myc.Update()
 
 		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.eps" % (i,j))
+#		myc.SaveAs("effplots/qsum_layer_%f.eps" % (i+0.25*(j-1.0)))
 		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.png" % (i,j))
+#		myc.SaveAs("effplots/qsum_layer_%f.png" % (i+0.25*(j-1.0)))
+
 		myc.Close()
+
+#print mpv
+#print layers 
+#print len(mpv), len(layers)
+
+myc= ROOT.TCanvas("myc", "myc", 1200, 700)
+myc.SetMargin(0.06,0.03,0.1,0.05)
+mg = ROOT.TMultiGraph() 
+mpv_normal = [303528.064300689, 352312.100588505, 350774.87686314, 332765.470517924, 334289.964739592, 348354.230620232, 329537.642593708, 318710.436911264, 342563.821378261, 340329.552984582, 392913.478994599, 354905.198959116, 377868.439312944, 321009.955167222, 328815.362549005, 322569.162543925, 362663.598239193, 341938.230147599, 362179.563741546, 387517.467432215, 372201.0867255, 313575.29882395, 380175.286450745, 363300.728439368, 343844.667825467, 371972.472791215, 370432.997805112, 401399.204501338, 326583.70712267, 364776.421386021, 388100.915810841, 323536.569645837, 392566.429281291, 342821.856919146, 383555.40418755, 303965.743666928, 341174.690772119, 338610.97523951, 335791.471480361, 388271.570406867, 354319.255181267, 411295.301985074, 0, 285759.884910684, 397822.971523206, 379709.678591405, 447221.720027027, 457370.248238703, 448918.245201091, 0, 0, 0, 0, 0, 0, 307739.894800603, 328619.503297273, 376349.089975099, 324076.486274348, 370181.492111644, 346462.043132986, 312111.029195271, 423065.071372817, 285315.870244694, 349564.503480597, 316240.488529595, 347859.544194015, 360631.393104858, 369236.305501702, 354994.545255458, 356571.010700327, 359903.993794379, 359133.417178487, 394549.474665558, 315386.759935999, 345435.133073917, 395806.344814682, 375112.997277463, 346583.42284846, 334304.483307983, 406169.081317888, 347452.982273121, 324005.845528657, 403222.144754067, 344646.28974536, 342444.044151126, 387342.374808193, 354714.95443417, 313268.424888424, 368929.463757324, 337322.063539689, 351474.335805635, 369232.984900282, 385277.894824363, 342966.54833081, 309296.235144156, 361996.081479171, 358277.176468599, 367640.029238626, 377394.235307121, 352200.743979508, 348253.167989371, 414654.180983594]
+layers_normal = [-16, -15.75, -15.5, -15, -14.75, -14.5, -14, -13.75, -13.5, -13.25, -12.75, -12.5, -12, -11.75, -11, -10.75, -10.5, -10, -9.75, -9.5, -9.25, -9, -8.75, -8.5, -8, -7.75, -7.5, -7.25, -7, -6.75, -6.5, -6, -5.75, -5.5, -5.25, -5, -4.5, -4.25, -4, -3.75, -3.5, -3.25, -2.75, -2.5, -2.25, -2, -1.75, -1.5, -1.25, -1, -0.25, 0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.25, 2.75, 3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75, 5.75, 6, 6.25, 6.5, 6.75, 7, 7.25, 7.5, 7.75, 8, 8.25, 8.5, 8.75, 9.5, 9.75, 10, 10.25, 10.5, 10.75, 11, 11.25, 11.5, 12, 12.25, 12.5, 12.75, 13, 13.5, 14, 15, 15.25, 16, 16.25, 16.5]
+mpv_60= [204390.740044279, 180851.40209414, 173116.583918593, 214904.109157249, 214409.682030695, 183728.479210658, 191441.942407133, 191085.494639266, 167770.934378763, 181069.435799791, 74286.5474257694, 173871.236256014, 210481.084160295, 205331.205682864, 209223.027028417, 191843.272208777, 193497.297197161, 191164.779907304, 216610.687506233, 186638.362584663, 196036.992212918, 270498.753384586, 222940.191828326, 197442.108615848]
+layers_60 = [-15.25, -14.25, -13, -12.25, -11.5, -11.25, -10.25, -8.25, -6.25, -4.75, -0.75, -0.5, 2.5, 5, 5.5, 11.75, 13.25, 13.75, 14.25, 14.5, 14.75, 15.5, 15.75, 16.75]
+mpv_140 = [92932.4725592466, 115015.537527879, 137380.337124857, 104365.117278332, 126660.569769894]
+layers_140 = [-3, 1.75, 5.25, 9, 9.25]
+mpv_200=[74286.5474257694]
+layers_200 = [-0.75]
+
+graph_60 = ROOT.TGraph(len(layers_60), array('d', layers_60), array('d', mpv_60))
+graph_normal= ROOT.TGraph(len(layers_normal), array('d', layers_normal), array('d', mpv_normal))
+graph_140 = ROOT.TGraph(len(layers_140), array('d', layers_140), array('d', mpv_140))
+graph_200 = ROOT.TGraph(len(layers_200), array('d', layers_200), array('d', mpv_200))
+ 
+graph_60.SetMarkerColor(kRed)
+graph_140.SetMarkerColor(kViolet)
+graph_200.SetMarkerColor(kGreen+2)
+graph_normal.SetMarkerColor(kBlue)
+
+
+leg = ROOT.TLegend(0.1, 0.15, 0.30, 0.31)
+#leg.SetTextFont(72)
+leg.SetTextSize(0.04)
+#(0.5,0.65,0.88,0.85);
+
+mg.Add(graph_60)
+mg.Add(graph_140)
+mg.Add(graph_200)
+mg.Add(graph_normal)
+
+leg.AddEntry(graph_60, "60V lower")
+leg.AddEntry(graph_140, "140V lower")
+leg.AddEntry(graph_200, "200V lower")
+leg.AddEntry(graph_normal, "Normal layers")
+
+#mg.Draw("AB") 
+mg.Draw("A*") 
+
+leg.Draw()
+
+mg.GetXaxis().SetTitle("Sector, Layer")
+mg.GetXaxis().SetTitleOffset(1.0)
+mg.GetXaxis().SetTitleSize(0.04)
+mg.GetXaxis().SetNdivisions(132)
+mg.GetYaxis().SetTitle("MPV")
+mg.GetYaxis().SetTitleOffset(0.7)
+mg.GetYaxis().SetTitleSize(0.04)
+gPad.Modified()
+#myc.BuildLegend()
+myc.Update()
+myc.SaveAs("effplots/MPVSummary.png")
+myc.Close()
+
 
 
 myc= ROOT.TCanvas("myc", "myc", 800, 600)
@@ -378,6 +476,29 @@ myc.Close()
 
 myc= ROOT.TCanvas("myc", "myc", 1200, 600)
 myc.SetMargin(0.06,0.03,0.1,0.05)
+h_eff_phi_good.SetStats(ROOT.kFALSE)
+h_eff_phi_good.SetTitle("")
+h_eff_phi_good.SetMaximum(1.)
+h_eff_phi_good.SetFillColor(ROOT.kRed-9)
+h_eff_phi_good.SetLineColor(ROOT.kRed+2)
+h_eff_phi_good.GetXaxis().SetTitle("Sector number")
+h_eff_phi_good.GetXaxis().SetNdivisions(134)
+h_eff_phi_good.GetYaxis().SetTitle("Phi Efficiency")
+h_eff_phi_good.GetYaxis().SetTitleOffset(0.7)
+h_eff_phi_good.GetYaxis().SetTitleSize(0.04)
+h_eff_phi_good.Draw("HIST")
+myc.Update()
+error_eff_phi_good = ROOT.TGraphAsymmErrors(h_eff_phi_good)
+error_eff_phi_good.SetFillStyle(3001)
+error_eff_phi_good.SetFillColor(ROOT.kRed+2)
+error_eff_phi_good.Draw("2 SAME")
+myc.Update()
+myc.SaveAs("effplots/h_eff_phi_good.eps")
+myc.SaveAs("effplots/h_eff_phi_good.png")
+myc.Close()
+
+myc= ROOT.TCanvas("myc", "myc", 1200, 600)
+myc.SetMargin(0.06,0.03,0.1,0.05)
 h_eff_eta.SetStats(ROOT.kFALSE)
 h_eff_eta.SetTitle("")
 h_eff_eta.SetMaximum(1.)
@@ -420,6 +541,29 @@ error_eff_eta_noStuck.Draw("2 SAME")
 myc.Update()
 myc.SaveAs("effplots/h_eff_eta_noStuck.eps")
 myc.SaveAs("effplots/h_eff_eta_noStuck.png")
+myc.Close()
+
+myc= ROOT.TCanvas("myc", "myc", 1200, 600)
+myc.SetMargin(0.06,0.03,0.1,0.05)
+h_eff_eta_good.SetStats(ROOT.kFALSE)
+h_eff_eta_good.SetTitle("")
+h_eff_eta_good.SetMaximum(1.)
+h_eff_eta_good.SetFillColor(ROOT.kRed-9)
+h_eff_eta_good.SetLineColor(ROOT.kRed+2)
+h_eff_eta_good.GetXaxis().SetTitle("Sector number")
+h_eff_eta_good.GetXaxis().SetNdivisions(134)
+h_eff_eta_good.GetYaxis().SetTitle("Eta Efficiency")
+h_eff_eta_good.GetYaxis().SetTitleOffset(0.7)
+h_eff_eta_good.GetYaxis().SetTitleSize(0.04)
+h_eff_eta_good.Draw("HIST")
+myc.Update()
+error_eff_eta_good = ROOT.TGraphAsymmErrors(h_eff_eta_good)
+error_eff_eta_good.SetFillStyle(3001)
+error_eff_eta_good.SetFillColor(ROOT.kRed+2)
+error_eff_eta_good.Draw("2 SAME")
+myc.Update()
+myc.SaveAs("effplots/h_eff_eta_good.eps")
+myc.SaveAs("effplots/h_eff_eta_good.png")
 myc.Close()
 
 # set the palette to make range close to 1 more sensitive
@@ -486,5 +630,35 @@ h2_eff_channel_modified.Draw("COLZ0")
 myc.Update()
 myc.SaveAs("effplots/h2_eff_channel_modified.eps")
 myc.SaveAs("effplots/h2_eff_channel_modified.png")
+myc.Close()
+'''
+
+'''
+myc= ROOT.TCanvas("myc", "myc", 800, 600)
+myc.SetMargin(0.12,0.05,0.1,0.05)
+h_eff_sector10_layer1.SetStats(ROOT.kFALSE)
+h_eff_sector10_layer1.SetTitle("")
+h_eff_sector10_layer1.GetXaxis().SetTitle("Channel number")
+h_eff_sector10_layer1.GetYaxis().SetTitle("Number of hits")
+h_eff_sector10_layer1.GetYaxis().SetTitleOffset(1.4)
+h_eff_sector10_layer1.GetYaxis().SetTitleSize(0.04)
+h_eff_sector10_layer1.SetLineColor(kBlack)
+h_eff_sector10_layer2.SetLineColor(kBlue)
+h_eff_sector10_layer3.SetLineColor(kViolet)
+h_eff_sector10_layer4.SetLineColor(kRed)
+h_eff_sector10_layer1.Draw("same")
+h_eff_sector10_layer2.Draw("same")
+h_eff_sector10_layer3.Draw("same")
+h_eff_sector10_layer4.Draw("same")
+leg = ROOT.TLegend(0.9,0.7,0.98,0.9)
+leg.SetHeader("Sector 10")
+leg.AddEntry(h_eff_sector10_layer1,"Layer1","l")
+leg.AddEntry(h_eff_sector10_layer2,"Layer2","l")
+leg.AddEntry(h_eff_sector10_layer3,"Layer3","l")
+leg.AddEntry(h_eff_sector10_layer4,"Layer4","l")
+leg.Draw()
+myc.Update()
+myc.SaveAs("effplots/eff_4layers_1sector.eps")
+myc.SaveAs("effplots/eff_4layers_1sector.png")
 myc.Close()
 '''
