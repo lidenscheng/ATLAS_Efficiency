@@ -195,7 +195,7 @@ void EffStudy::Loop()
       // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-//      if (jentry%100000==0) cout<<"Event: "<<jentry<<endl;
+      if (jentry%100000==0) cout<<"Event: "<<jentry<<endl;
       h_cutflow->Fill(0);
 
 // filling the histograms for 4 layers of a particular sector; just a quick check, don't keep in code 
@@ -342,9 +342,9 @@ void EffStudy::Loop()
                if( TMath::Abs(badphi-goodtrk_phi[i]) > 0.7 && TMath::Abs(badphi+2*pi-goodtrk_phi[i]) > 0.7 ) {
                   morethan2trk_index.push_back(goodtrk_index[i]);
                   morethan2 = true;
-//                  cout<<"ERROR: more than two matched sectors!"<<endl;
-//                 cout<<"info: "<<goodtrk_index[i]<<"  "<<trkP->at(goodtrk_index[i])/1.e3<<"  "<<trkEta->at(goodtrk_index[i])<<"  "<<goodtrk_phi[i]<<endl;
-//                  cout<<"      "<<sector<<"  "<<sector_2ndary<<"  "<<hit_sector->at(j)<<endl;
+                  cout<<"ERROR: more than two matched sectors!"<<endl;
+                 cout<<"info: "<<goodtrk_index[i]<<"  "<<trkP->at(goodtrk_index[i])/1.e3<<"  "<<trkEta->at(goodtrk_index[i])<<"  "<<goodtrk_phi[i]<<endl;
+                  cout<<"      "<<sector<<"  "<<sector_2ndary<<"  "<<hit_sector->at(j)<<endl;
                   break;
                }
             }
@@ -383,7 +383,7 @@ void EffStudy::Loop()
 //			lowPhiIndex = lower_bound(phiBins.begin(), phiBins.end(), matchedtrk_phi[i]);
 //			lowEtaIndex = lower_bound(etaBins.begin(), etaBins.end(), TMath::Abs(trkEta->at(goodtrk_index[i]))); 
 
-
+//			cout << matchedtrk_phi[i] << "	" << TMath::Abs(trkEta->at(goodtrk_index[i])) << endl; 
 
             for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
                if( hitToMuon->at(j)!=goodtrk_index[i] || hit_sector->at(j)!=sector ) continue;
@@ -418,7 +418,7 @@ void EffStudy::Loop()
 			if(avgPhi!=0) avgPhi = avgPhi/n_chlphi;
 			if(avgEta!=0) avgEta = avgEta/n_chleta; 
 
-			cout << avgPhi <<"	"<< avgEta << endl; 
+//			cout << avgPhi <<"	"<< avgEta << endl; 
 
             for(UInt_t j=0; j<layer_phi.size(); ++j) { // loop over all phi layers, accumulate the denominator
 
@@ -428,7 +428,6 @@ void EffStudy::Loop()
 
 					lowPhiIndex = lower_bound(phiBins.begin(), phiBins.end(), avgPhi);
 					++n_trkperphi[sector+16][j][lowPhiIndex-phiBins.begin()];
-
 				}
 
 			}
@@ -463,6 +462,7 @@ void EffStudy::Loop()
          h2_trk_P_eta_1->Fill(trkP->at(goodtrk_index[i])/1.e3, TMath::Abs(trkEta->at(goodtrk_index[i])));
          h2_trk_P_phi_1->Fill(trkP->at(goodtrk_index[i])/1.e3, goodtrk_phi[i]);
          h2_trk_eta_phi_1->Fill(TMath::Abs(trkEta->at(goodtrk_index[i])), goodtrk_phi[i]);
+//			cout << "I got here" << endl; 
          }
 
 
@@ -471,9 +471,6 @@ void EffStudy::Loop()
             h_trk_sec->Fill(sector_2ndary);
             h2_trk_sec_phi->Fill(sector_2ndary, goodtrk_phi[i]);
             // but trk_P_eta and trk_P_phi will not be filled twice
-
-//			if(sector_2ndary==3 && layer_2nd==1)
-//				cout << TMath::Abs(trkEta->at(goodtrk_index[i])) << endl; 
 
             ++n_trkpersec[sector_2ndary+16];
 			++n_trkpersec_phi_good[sector_2ndary+16];
@@ -490,6 +487,8 @@ void EffStudy::Loop()
 			Double_t avgPhi = 0.0;
 			Double_t avgEta = 0.0; 
 
+//			cout << matchedtrk_phi[i] << "	" << TMath::Abs(trkEta->at(goodtrk_index[i])) << endl; 
+
             for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
                if( hitToMuon->at(j)!=goodtrk_index[i] || hit_sector->at(j)!=sector_2ndary ) continue;
 
@@ -501,7 +500,6 @@ void EffStudy::Loop()
 				++n_trkperphi[sector_2ndary+16][int(hit_wlay->at(j))-1][lowPhiIndex-phiBins.begin()]; 
 				++n_trkpereta[sector_2ndary+16][int(hit_wlay->at(j))-1][lowEtaIndex-etaBins.begin()]; 
 				
-
                if( hit_measphi->at(j)==1 ) {
                   avgchlphi += hit_pstrip->at(j);
                   ++n_chlphi;
@@ -523,7 +521,7 @@ void EffStudy::Loop()
 			if(avgPhi!=0) avgPhi = avgPhi/n_chlphi;
 			if(avgEta!=0) avgEta = avgEta/n_chleta; 
 
-			cout << avgPhi <<"	"<< avgEta << endl; 
+//			cout << avgPhi <<"	"<< avgEta << endl; 
 
             for(UInt_t j=0; j<layer_phi.size(); ++j) {
                if( layer_phi[j]==0 ) 
@@ -569,8 +567,20 @@ void EffStudy::Loop()
       for(UInt_t i=0; i<hit_sector->size(); ++i) { // loop over hits
          bool matched = false;
          Double_t badphi = 0., goodphi = 0.; // to get rid of mismatched hits
+
+         Float_t fillnumber = hit_sector->at(i)+0.25*(hit_wlay->at(i)-1); // a combination of sector # and layer #
+
          for(UInt_t j=0; j<matchedtrk_index.size(); ++j) {// loop over matched trks
             if( hitToMuon->at(i)==matchedtrk_index[j] ) {
+
+//         	if( hit_measphi->at(i)==1 ) {
+				h2_eff_phi->Fill(matchedtrk_phi[j], fillnumber, 1); 
+//			}
+
+//			else{
+				h2_eff_eta->Fill(TMath::Abs(trkEta->at(goodtrk_index[j])), fillnumber, 1); 
+//			}
+
                matched = true;
                goodphi = matchedtrk_phi[j];
             }
@@ -586,18 +596,20 @@ void EffStudy::Loop()
          if( TMath::Abs(badphi-goodphi) <= 0.7 || TMath::Abs(badphi+2*pi-goodphi) <= 0.7) matched = false;
          if( !matched ) continue;
 						
-         Float_t fillnumber = hit_sector->at(i)+0.25*(hit_wlay->at(i)-1); // a combination of sector # and layer #
+//         Float_t fillnumber = hit_sector->at(i)+0.25*(hit_wlay->at(i)-1); // a combination of sector # and layer #
 
-         for(UInt_t j=0; j<matchedtrk_index.size(); ++j) {// loop over matched trks
+//		cout << matchedtrk_index.size() << endl; 
+
+/*         for(UInt_t j=0; j<matchedtrk_index.size(); ++j) {// loop over matched trks
          	if( hit_measphi->at(i)==1 ) {
-				h2_eff_phi->Fill(matchedtrk_phi[i], fillnumber, 1); 
+				h2_eff_phi->Fill(matchedtrk_phi[j], fillnumber, 1); 
 			}
 
 			else{
-				h2_eff_eta->Fill(TMath::Abs(trkEta->at(goodtrk_index[i])), fillnumber, 1); 
+				h2_eff_eta->Fill(TMath::Abs(trkEta->at(goodtrk_index[j])), fillnumber, 1); 
 			}
 		}
-
+*/
 
          if( hit_measphi->at(i)==1 ) {
 
@@ -773,6 +785,34 @@ void EffStudy::Loop()
 //				cout << "i= " << i << "	" << "j= " << j << "	"<< "k= " << k << "	" << "bin k+2, (i+1)*5+j+1= " << k+2 <<", " << (i+1)*5+j+1 << endl;
 //				cout << i <<"	" << j << "	" << k << endl;
 //			}
+         }
+      }
+   }
+
+   for(UInt_t i=0; i<n_trkperphi.size(); ++i) { // normalization
+      for(UInt_t j=0; j<n_trkperphi[i].size(); ++j) {
+         for(UInt_t k=0; k<n_trkperphi[i][j].size(); ++k) {
+            if( h2_eff_phi->GetBinContent( k, (i+1)*5+j+1 )!=0 ) {
+               Double_t bincontent = h2_eff_phi->GetBinContent( k, (i+1)*5+j+1 );
+               Double_t binerror = bincontent*(n_trkperphi[i][j][k]-bincontent)/TMath::Power(n_trkperphi[i][j][k], 3);
+               h2_eff_phi->SetBinContent( k, (i+1)*5+j+1, bincontent/n_trkperphi[i][j][k] );
+               h2_eff_phi->SetBinError( k, (i+1)*5+j+1, binerror );
+			}
+
+         }
+      }
+   }
+
+   for(UInt_t i=0; i<n_trkpereta.size(); ++i) { // normalization
+      for(UInt_t j=0; j<n_trkpereta[i].size(); ++j) {
+         for(UInt_t k=0; k<n_trkpereta[i][j].size(); ++k) {
+            if( h2_eff_eta->GetBinContent( k, (i+1)*5+j+1 )!=0 ) {
+               Double_t bincontent = h2_eff_eta->GetBinContent( k, (i+1)*5+j+1 );
+               Double_t binerror = bincontent*(n_trkpereta[i][j][k]-bincontent)/TMath::Power(n_trkpereta[i][j][k], 3);
+               h2_eff_eta->SetBinContent( k, (i+1)*5+j+1, bincontent/n_trkpereta[i][j][k] );
+               h2_eff_eta->SetBinError( k, (i+1)*5+j+1, binerror );
+			}
+
          }
       }
    }
