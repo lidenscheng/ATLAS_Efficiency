@@ -495,7 +495,7 @@ void EffStudy::Loop()
 			h2_eff_channel_onlyNumerator->Fill(-1.*hit_pstrip->at(i), fillnumber, 1);
 
 
-			if(fillnumber==2.0)
+			if(fillnumber==-4.75)
 				h_eff_channel_forOneLayer->Fill(-1.*hit_pstrip->at(i));  
 
 
@@ -531,7 +531,7 @@ void EffStudy::Loop()
 		        h2_eff_channel->Fill(hit_pstrip->at(i), fillnumber, 1);
 				h2_eff_channel_onlyNumerator->Fill(hit_pstrip->at(i), fillnumber, 1);
 
-			    if(fillnumber==2.0)
+			    if(fillnumber==-4.75)
 					h_eff_channel_forOneLayer->Fill(hit_pstrip->at(i));
 
 // filling the histograms for 4 layers of a particular sector; just a quick check, don't keep in code 
@@ -588,14 +588,12 @@ void EffStudy::Loop()
    for(UInt_t i=0; i<n_trkpersec.size(); ++i) { // normalization
       for(UInt_t j=0; j<4; ++j) {
 
-//		cout << n_trkpersec[i] << "	" << n_trkpersec_phi_good[i] << "	" << n_trkpersec_eta_good[i] << endl; 
-//		cout << (i+1)*5+j+1 << "	" << h_eff_phi->GetBinContent((i+1)*5+j+1) << endl; 
-
 		for(UInt_t m=0; m<secPhi.size(); ++m)
 		{
 			if(secPhi[m]==i && layerPhi[m]==j)
 				--n_trkpersec_phi_good[i];
 		}
+
 
 		for(UInt_t m=0; m<secEta.size(); ++m)
 		{
@@ -603,7 +601,7 @@ void EffStudy::Loop()
 				--n_trkpersec_eta_good[i];
 		}
 
-//		cout << n_trkpersec[i] << "	" << n_trkpersec_phi_good[i] << "	" << n_trkpersec_eta_good[i] << endl; 
+
 
 
          if( h_eff_phi->GetBinContent((i+1)*5+j+1)!=0 ) {
@@ -611,7 +609,6 @@ void EffStudy::Loop()
             Double_t binerror = bincontent*(n_trkpersec[i]-bincontent)/TMath::Power(n_trkpersec[i], 3);
             h_eff_phi->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec[i]);
             h_eff_phi->SetBinError((i+1)*5+j+1, binerror);
-//			cout << (i+1)*5+j+1 <<"	" << h_eff_phi->GetBinContent((i+1)*5+j+1) << endl; 
          }
 
          if( h_eff_phi_good->GetBinContent((i+1)*5+j+1)!=0 ) {
@@ -619,8 +616,9 @@ void EffStudy::Loop()
             Double_t binerror = bincontent*(n_trkpersec_phi_good[i]-bincontent)/TMath::Power(n_trkpersec_phi_good[i], 3);
 			h_eff_phi_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec_phi_good[i]);
             h_eff_phi_good->SetBinError((i+1)*5+j+1, binerror);
-//			cout << (i+1)*5+j+1 <<"	" << h_eff_phi_good->GetBinContent((i+1)*5+j+1) << endl; 
          }
+
+//		cout << i << "	" << j <<"	" << h_eff_phi->GetBinContent((i+1)*5+j+1) << "	" << h_eff_phi_good->GetBinContent((i+1)*5+j+1) << endl; 
 
          if( h_eff_eta->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_eta->GetBinContent((i+1)*5+j+1);
@@ -634,8 +632,9 @@ void EffStudy::Loop()
             Double_t binerror = bincontent*(n_trkpersec_eta_good[i]-bincontent)/TMath::Power(n_trkpersec_eta_good[i], 3);
 			h_eff_eta_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec_eta_good[i]);
             h_eff_eta_good->SetBinError((i+1)*5+j+1, binerror);
-//			cout << (i+1)*5+j+1 <<"	" << h_eff_eta_good->GetBinContent((i+1)*5+j+1) << endl; 
          }
+
+//		cout << i << "	" << j <<"	" << h_eff_eta->GetBinContent((i+1)*5+j+1) << "	" << h_eff_eta_good->GetBinContent((i+1)*5+j+1) << endl; 
 
       }
    }
@@ -664,11 +663,11 @@ void EffStudy::Loop()
    }
 
 
-	for(UInt_t k=0; k<n_trkperchl[18][0].size(); ++k) {
+	for(UInt_t k=0; k<n_trkperchl[11][1].size(); ++k) {
 		if( h_eff_channel_forOneLayer->GetBinContent(k+2)!=0 ) {
 			Double_t bincontent = h_eff_channel_forOneLayer->GetBinContent(k+2);
-            Double_t binerror = bincontent*(n_trkperchl[18][0][k]-bincontent)/TMath::Power(n_trkperchl[18][0][k], 3);
-            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/n_trkperchl[18][0][k] );
+            Double_t binerror = bincontent*(n_trkperchl[11][1][k]-bincontent)/TMath::Power(n_trkperchl[11][1][k], 3);
+            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/n_trkperchl[11][1][k] );
             h_eff_channel_forOneLayer->SetBinError( k+2, binerror );
 		}
      }
