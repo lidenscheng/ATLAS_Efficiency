@@ -27,7 +27,7 @@ void EffStudy::Loop()
 //   vector<UInt_t> secVectorAll, layerVectorAll, channelVectorAll;
    vector<UInt_t> secPhi, secEta; 
    vector<UInt_t> layerPhi, layerEta;
-   vector<Int_t> channelPhi, channelEta; 
+   vector<UInt_t> channelPhi, channelEta; 
    UInt_t sec, layer, channel;  
 
 /*   while(inputStuck >> sec >> layer >> channel)
@@ -332,7 +332,8 @@ void EffStudy::Loop()
             h2_trk_eta_phi_0->Fill(TMath::Abs(trkEta->at(goodtrk_index[i])), goodtrk_phi[i]);
 //		    h_eta_cut2->Fill(trkEta->at(goodtrk_index[i])); 
 
-            ++n_trkpersec[sector+16]; // why 16? see the last part of this code for conversion rule; ex if sec -16, then it would be 0 here 
+            ++n_trkpersec[sector+16]; // why 16? see the last part of this code for conversion rule; ex if sec -16, then it would be 0 here
+ 
 			++n_trkpersec_phi_good[sector+16];
 			++n_trkpersec_eta_good[sector+16];
 
@@ -495,8 +496,8 @@ void EffStudy::Loop()
 			h2_eff_channel_onlyNumerator->Fill(-1.*hit_pstrip->at(i), fillnumber, 1);
 
 
-			if(fillnumber==-4.75)
-				h_eff_channel_forOneLayer->Fill(-1.*hit_pstrip->at(i));  
+//			if(fillnumber==14.25)
+//				h_eff_channel_forOneLayer->Fill(-1.*hit_pstrip->at(i));  
 
 
 
@@ -531,7 +532,7 @@ void EffStudy::Loop()
 		        h2_eff_channel->Fill(hit_pstrip->at(i), fillnumber, 1);
 				h2_eff_channel_onlyNumerator->Fill(hit_pstrip->at(i), fillnumber, 1);
 
-			    if(fillnumber==-4.75)
+			    if(fillnumber==-11.0)
 					h_eff_channel_forOneLayer->Fill(hit_pstrip->at(i));
 
 // filling the histograms for 4 layers of a particular sector; just a quick check, don't keep in code 
@@ -549,6 +550,19 @@ void EffStudy::Loop()
 */         
 			}
 
+
+/*		for(UInt_t m=0; m<secPhi.size(); ++m)
+		{
+			fillnumber = (secPhi[m]-16.0) + 0.25*layerPhi[m]; 
+			h_eff_phi_good->Fill(fillnumber);
+		}
+
+		for(UInt_t m=0; m<secEta.size(); ++m)
+		{
+			fillnumber = (secEta[m]-16.0) + 0.25*layerEta[m]; 
+			h_eff_eta_good->Fill(fillnumber);			
+		}
+*/
 
 	  	 TString histoname = TString::Format("qsum_sector_%d_layer_%d", hit_sector->at(i), hit_wlay->at(i));
 //	  	 TString histoname = TString::Format("qpeak_sector_%d_layer_%d", hit_sector->at(i), hit_wlay->at(i));
@@ -574,12 +588,14 @@ void EffStudy::Loop()
 
 } // end loop of events
 
-
-
-/*
-   // useless fit
-   TF1 *f_trk_phi = new TF1("f_trk_phi", "[0]",-3.3,3.3);
-   h_trk_phi->Fit(f_trk_phi, "R");
+/*n_trkpersec_phi_good[3]= n_trkpersec_phi_good[3]-24;
+n_trkpersec_phi_good[18]= n_trkpersec_phi_good[18]-12;
+n_trkpersec_phi_good[19]= n_trkpersec_phi_good[19]-12;
+n_trkpersec_phi_good[22]= n_trkpersec_phi_good[22]-12;
+n_trkpersec_phi_good[24]= n_trkpersec_phi_good[24]-12;
+n_trkpersec_phi_good[26]= n_trkpersec_phi_good[26]-12;
+n_trkpersec_phi_good[28]= n_trkpersec_phi_good[28]-12;
+n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
 */
 
    // sector # | vector i | bin # (big block, block i is bin (i-1)*5+1~i*5)
@@ -588,7 +604,7 @@ void EffStudy::Loop()
    for(UInt_t i=0; i<n_trkpersec.size(); ++i) { // normalization
       for(UInt_t j=0; j<4; ++j) {
 
-		for(UInt_t m=0; m<secPhi.size(); ++m)
+/*		for(UInt_t m=0; m<secPhi.size(); ++m)
 		{
 			if(secPhi[m]==i && layerPhi[m]==j)
 				--n_trkpersec_phi_good[i];
@@ -601,8 +617,7 @@ void EffStudy::Loop()
 				--n_trkpersec_eta_good[i];
 		}
 
-
-
+*/
 
          if( h_eff_phi->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_phi->GetBinContent((i+1)*5+j+1);
@@ -646,6 +661,7 @@ void EffStudy::Loop()
    for(UInt_t i=0; i<n_trkperchl.size(); ++i) { // normalization
       for(UInt_t j=0; j<n_trkperchl[i].size(); ++j) {
          for(UInt_t k=0; k<n_trkperchl[i][j].size(); ++k) {
+
             if( h2_eff_channel->GetBinContent( k+2, (i+1)*5+j+1 )!=0 ) {
                Double_t bincontent = h2_eff_channel->GetBinContent( k+2, (i+1)*5+j+1 );
                Double_t binerror = bincontent*(n_trkperchl[i][j][k]-bincontent)/TMath::Power(n_trkperchl[i][j][k], 3);
@@ -662,18 +678,21 @@ void EffStudy::Loop()
       }
    }
 
-
-	for(UInt_t k=0; k<n_trkperchl[11][1].size(); ++k) {
-		if( h_eff_channel_forOneLayer->GetBinContent(k+2)!=0 ) {
+    Double_t sum=0.0;
+	UInt_t count= 0;  
+	for(UInt_t k=0; k<n_trkperchl[5][0].size(); ++k) {
+		if( h_eff_channel_forOneLayer->GetBinContent(k+2)!=0 && (k>=98 || k<=228)) {
 			Double_t bincontent = h_eff_channel_forOneLayer->GetBinContent(k+2);
-            Double_t binerror = bincontent*(n_trkperchl[11][1][k]-bincontent)/TMath::Power(n_trkperchl[11][1][k], 3);
-            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/n_trkperchl[11][1][k] );
+            Double_t binerror = bincontent*((n_trkperchl[5][0][k])-bincontent)/TMath::Power(n_trkperchl[5][0][k], 3);
+            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/(n_trkperchl[5][0][k]) );
             h_eff_channel_forOneLayer->SetBinError( k+2, binerror );
+
+			sum += h_eff_channel_forOneLayer->GetBinContent(k+2);
+			count++;  
 		}
      }
 
-
-
+cout << "Eta Efficiency for this layer= " << sum/count << endl; 
 
    outputfile->Write();
    outputfile->Close();
