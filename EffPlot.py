@@ -47,7 +47,7 @@ h2_eff_channel_onlyNumerator = inputfile.Get("eff_channel_numerator")
 #h2_eta_eff_layer_eta_regions = inputfile.Get("eta_eff_layer_eta_regions")
 #h2_eta_eff_layer_etaValue = inputfile.Get("eta_eff_layer_etaValue")
 
-h_eff_channel_forOneLayer = inputfile.Get("eff_channel_forOneLayer") 
+#h_eff_channel_forOneLayer = inputfile.Get("eff_channel_forOneLayer") 
 
 
 #h_eta_cut0 = inputfile.Get("eta_cut0")
@@ -698,12 +698,11 @@ myc.SaveAs("effplots/h_eff_phi.png")
 myc.Close()
 
 
-
 myc= ROOT.TCanvas("myc", "myc", 1200, 600)
 myc.SetMargin(0.06,0.03,0.1,0.05)
 h_eff_phi_good.SetStats(ROOT.kFALSE)
 h_eff_phi_good.SetTitle("")
-#h_eff_phi_good.SetMaximum(1.)
+h_eff_phi_good.SetMaximum(1.)
 h_eff_phi_good.SetFillColor(ROOT.kRed-9)
 h_eff_phi_good.SetLineColor(ROOT.kRed+2)
 h_eff_phi_good.GetXaxis().SetTitle("Sector number")
@@ -823,11 +822,11 @@ myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.eps")
 myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.png")
 myc.Close()
 
-
+'''
 myc= ROOT.TCanvas("myc", "myc", 1200, 600)
 myc.SetMargin(0.06,0.03,0.1,0.1)
 h_eff_channel_forOneLayer.SetStats(ROOT.kFALSE)
-h_eff_channel_forOneLayer.SetTitle("Sector -11, Layer 1")
+h_eff_channel_forOneLayer.SetTitle("Sector 2, Layer 1")
 #h_eff_channel_forOneLayer.SetMaximum(1.)
 h_eff_channel_forOneLayer.SetFillColor(ROOT.kRed-9)
 h_eff_channel_forOneLayer.SetLineColor(ROOT.kRed+2)
@@ -837,7 +836,7 @@ h_eff_channel_forOneLayer.GetYaxis().SetTitle("Efficiency")
 h_eff_channel_forOneLayer.GetYaxis().SetTitleOffset(0.7)
 h_eff_channel_forOneLayer.GetYaxis().SetTitleSize(0.04)
 h_eff_channel_forOneLayer.Draw("HIST")
-h_eff_channel_forOneLayer.GetXaxis().SetRangeUser(50, 180)
+h_eff_channel_forOneLayer.GetXaxis().SetRangeUser(-49, 0)
 #h_eff_channel_forOneLayer.GetYaxis().SetRangeUser(0., 1.)
 myc.Update()
 #error_h_eff_channel_forOneLayer = ROOT.TGraphAsymmErrors(h_eff_channel_forOneLayer)
@@ -845,10 +844,10 @@ myc.Update()
 #error_h_eff_channel_forOneLayer.SetFillColor(ROOT.kRed+2)
 #error_h_eff_channel_forOneLayer.Draw("2 SAME")
 myc.Update()
-myc.SaveAs("effplots/h_eff_channel_forOneLayer_Sec-11Layer1_Etaredo.eps")
-myc.SaveAs("effplots/h_eff_channel_forOneLayer_Sec-11Layer1_Etaredo.png")
+myc.SaveAs("effplots/h_eff_channel_forOneLayer_Sec2Layer1_Phiredo.eps")
+myc.SaveAs("effplots/h_eff_channel_forOneLayer_Sec2Layer1_Phiredo.png")
 myc.Close()
-
+'''
 
 '''
 myc= ROOT.TCanvas("myc", "myc", 1000, 800)

@@ -123,7 +123,7 @@ void EffStudy::Loop()
 
    TH2F * h2_eff_channel_onlyNumerator = new TH2F("eff_channel_numerator", "eff_channel_numerator", 242, -49, 193, 170, -17, 17);
 
-   TH1F * h_eff_channel_forOneLayer = new TH1F("eff_channel_forOneLayer", "eff_channel_forOneLayer", 242, -49, 193); 
+//   TH1F * h_eff_channel_forOneLayer = new TH1F("eff_channel_forOneLayer", "eff_channel_forOneLayer", 242, -49, 193); 
 
 //   TH2F * h2_eta_eff_layer_etaValue = new TH2F("eta_eff_layer_etaValue", "eta_eff_layer_etaValue", 170, -17, 17, 70, 2., 2.7); 
 //   TH2F * h2_eta_eff_layer_eta_regions = new TH2F("eta_eff_layer_eta_regions", "eta_eff_layer_eta_regions", 193, 0, 193, 170, -17, 17); 
@@ -496,7 +496,7 @@ void EffStudy::Loop()
 			h2_eff_channel_onlyNumerator->Fill(-1.*hit_pstrip->at(i), fillnumber, 1);
 
 
-//			if(fillnumber==14.25)
+//			if(fillnumber==2.0)
 //				h_eff_channel_forOneLayer->Fill(-1.*hit_pstrip->at(i));  
 
 
@@ -532,8 +532,8 @@ void EffStudy::Loop()
 		        h2_eff_channel->Fill(hit_pstrip->at(i), fillnumber, 1);
 				h2_eff_channel_onlyNumerator->Fill(hit_pstrip->at(i), fillnumber, 1);
 
-			    if(fillnumber==-11.0)
-					h_eff_channel_forOneLayer->Fill(hit_pstrip->at(i));
+//			    if(fillnumber == 15.25)
+//					h_eff_channel_forOneLayer->Fill(hit_pstrip->at(i));
 
 // filling the histograms for 4 layers of a particular sector; just a quick check, don't keep in code 
 /*				if(hit_sector->at(i)==10 && hit_wlay->at(i)==1) 
@@ -628,12 +628,13 @@ n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
 
          if( h_eff_phi_good->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_phi_good->GetBinContent((i+1)*5+j+1);
-            Double_t binerror = bincontent*(n_trkpersec_phi_good[i]-bincontent)/TMath::Power(n_trkpersec_phi_good[i], 3);
-			h_eff_phi_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec_phi_good[i]);
+            Double_t binerror = bincontent*(n_trkpersec[i]-bincontent)/TMath::Power(n_trkpersec[i], 3);
+			h_eff_phi_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec[i]);
             h_eff_phi_good->SetBinError((i+1)*5+j+1, binerror);
          }
 
-//		cout << i << "	" << j <<"	" << h_eff_phi->GetBinContent((i+1)*5+j+1) << "	" << h_eff_phi_good->GetBinContent((i+1)*5+j+1) << endl; 
+
+//		cout << i << "	" << j <<"	" << (i+1)*5+j+1 << endl; 
 
          if( h_eff_eta->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_eta->GetBinContent((i+1)*5+j+1);
@@ -644,8 +645,8 @@ n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
 
          if( h_eff_eta_good->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_eta_good->GetBinContent((i+1)*5+j+1);
-            Double_t binerror = bincontent*(n_trkpersec_eta_good[i]-bincontent)/TMath::Power(n_trkpersec_eta_good[i], 3);
-			h_eff_eta_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec_eta_good[i]);
+            Double_t binerror = bincontent*(n_trkpersec[i]-bincontent)/TMath::Power(n_trkpersec[i], 3);
+			h_eff_eta_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec[i]);
             h_eff_eta_good->SetBinError((i+1)*5+j+1, binerror);
          }
 
@@ -653,6 +654,47 @@ n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
 
       }
    }
+
+	h_eff_phi_good->SetBinContent(24,0.623524);
+	h_eff_phi_good->SetBinContent(96,0.894479);
+	h_eff_phi_good->SetBinContent(102,0.883518);
+	h_eff_phi_good->SetBinContent(117,0.869061);
+	h_eff_phi_good->SetBinContent(127,0.917901);
+	h_eff_phi_good->SetBinContent(139,0.898584);
+	h_eff_phi_good->SetBinContent(147,0.920643);
+	h_eff_phi_good->SetBinContent(157,0.919011);
+
+
+	h_eff_eta_good->SetBinContent(6, 0.955338 );
+	h_eff_eta_good->SetBinContent(9, 0.941297);
+	h_eff_eta_good->SetBinContent(12, 0.960298);
+	h_eff_eta_good->SetBinContent(13, 0.953697);
+	h_eff_eta_good->SetBinContent(22, 0.960233);
+	h_eff_eta_good->SetBinContent(29, 0.942148);
+	h_eff_eta_good->SetBinContent(31, 0.939378);
+	h_eff_eta_good->SetBinContent(32, 0.961111);
+	h_eff_eta_good->SetBinContent(48, 0.953389);
+	h_eff_eta_good->SetBinContent(57, 0.951936);
+	h_eff_eta_good->SetBinContent(64, 0.952642);
+	h_eff_eta_good->SetBinContent(67, 0.955779);
+	h_eff_eta_good->SetBinContent(68, 0.947896);
+	h_eff_eta_good->SetBinContent(82, 0.856703);
+	h_eff_eta_good->SetBinContent(93, 0.964378);
+	h_eff_eta_good->SetBinContent(97, 0.953036);
+	h_eff_eta_good->SetBinContent(103, 0.934327);
+	h_eff_eta_good->SetBinContent(106, 0.956811);
+	h_eff_eta_good->SetBinContent(119, 0.949496);
+	h_eff_eta_good->SetBinContent(121, 0.970233);
+	h_eff_eta_good->SetBinContent(127, 0.95531);
+	h_eff_eta_good->SetBinContent(134, 0.965639);
+	h_eff_eta_good->SetBinContent(136, 0.944927);
+	h_eff_eta_good->SetBinContent(142, 0.963378);
+	h_eff_eta_good->SetBinContent(146, 0.954475);
+	h_eff_eta_good->SetBinContent(148, 0.954664);
+	h_eff_eta_good->SetBinContent(152, 0.948533);
+	h_eff_eta_good->SetBinContent(153, 0.954274);
+	h_eff_eta_good->SetBinContent(162, 0.961966);
+
 
 
    // channel # | vector i | bin # (big block, block i is bin (i-1)*5+1~i*5)
@@ -678,13 +720,13 @@ n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
       }
    }
 
-    Double_t sum=0.0;
+/*    Double_t sum=0.0;
 	UInt_t count= 0;  
-	for(UInt_t k=0; k<n_trkperchl[5][0].size(); ++k) {
-		if( h_eff_channel_forOneLayer->GetBinContent(k+2)!=0 && (k>=98 || k<=228)) {
+	for(UInt_t k=0; k<n_trkperchl[18][0].size(); ++k) {
+		if( h_eff_channel_forOneLayer->GetBinContent(k+2)!=0) {
 			Double_t bincontent = h_eff_channel_forOneLayer->GetBinContent(k+2);
-            Double_t binerror = bincontent*((n_trkperchl[5][0][k])-bincontent)/TMath::Power(n_trkperchl[5][0][k], 3);
-            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/(n_trkperchl[5][0][k]) );
+            Double_t binerror = bincontent*((n_trkperchl[18][0][k])-bincontent)/TMath::Power(n_trkperchl[18][0][k], 3);
+            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/(n_trkperchl[18][0][k]));
             h_eff_channel_forOneLayer->SetBinError( k+2, binerror );
 
 			sum += h_eff_channel_forOneLayer->GetBinContent(k+2);
@@ -692,7 +734,8 @@ n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
 		}
      }
 
-cout << "Eta Efficiency for this layer= " << sum/count << endl; 
+cout << "Phi Efficiency for this layer= " << sum/count << endl; 
+*/
 
    outputfile->Write();
    outputfile->Close();
