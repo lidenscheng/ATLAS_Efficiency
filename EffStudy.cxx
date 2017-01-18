@@ -123,6 +123,8 @@ void EffStudy::Loop()
 
    TH2F * h2_eff_channel_onlyNumerator = new TH2F("eff_channel_numerator", "eff_channel_numerator", 242, -49, 193, 170, -17, 17);
 
+   TH1F * h_trk_sfit = new TH1F("trk_sfit", "trk_sfit", 22, 0, 21);
+
 //   TH1F * h_eff_channel_forOneLayer = new TH1F("eff_channel_forOneLayer", "eff_channel_forOneLayer", 242, -49, 193); 
 
 //   TH2F * h2_eta_eff_layer_etaValue = new TH2F("eta_eff_layer_etaValue", "eta_eff_layer_etaValue", 170, -17, 17, 70, 2., 2.7); 
@@ -162,39 +164,9 @@ void EffStudy::Loop()
       // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-      if (jentry%100000==0) cout<<"Event: "<<jentry<<endl;
+//      if (jentry%100000==0) cout<<"Event: "<<jentry<<endl;
       h_cutflow->Fill(0);
 
-// filling the histograms for 4 layers of a particular sector; just a quick check, don't keep in code 
-/*		for(UInt_t i=0; i<hit_sector->size(); ++i) {
-			if( hit_measphi->at(i)==1 ) {
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==1) 
-					h_hit_sector10_layer1->Fill(-1.*hit_pstrip->at(i)); 
-
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==2) 
-					h_hit_sector10_layer2->Fill(-1.*hit_pstrip->at(i));
-
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==3) 
-					h_hit_sector10_layer3->Fill(-1.*hit_pstrip->at(i));
-
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==4) 
-					h_hit_sector10_layer4->Fill(-1.*hit_pstrip->at(i));
-			}
-				else{
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==1) 
-						h_hit_sector10_layer1->Fill(hit_pstrip->at(i));
-
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==2) 
-						h_hit_sector10_layer2->Fill(hit_pstrip->at(i));
-
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==3) 
-						h_hit_sector10_layer3->Fill(hit_pstrip->at(i));
-
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==4) 
-						h_hit_sector10_layer4->Fill(hit_pstrip->at(i));
-			}
-		}
-*/
 
 //	  for(UInt_t i=0; i<trkP->size(); ++i) {
 //		 h_eta_cut0->Fill(trkEta->at(i)); 
@@ -218,7 +190,6 @@ void EffStudy::Loop()
 //         h_trk_eta_org->Fill(trkEta->at(i));  
          if( TMath::Abs(trkEta->at(i))<2. || TMath::Abs(trkEta->at(i))>2.7 ) continue; // cut out non-CSC region
          if( (trkP->at(i)/1.e3)<=60 ) continue; // cut on pt of trks
-//         if( (trkP->at(i)/1.e3)>60 ) continue; // looking to see how lower momentum tracks behave 
          goodtrk_index.push_back(i); // if no good trk in this event, it will not be filled. so no worry
          h_trk_P->Fill(trkP->at(i)/1.e3);
          h_trk_eta->Fill(trkEta->at(i));
@@ -228,40 +199,27 @@ void EffStudy::Loop()
          goodtrk_phi.push_back(phi);
          h_trk_phi->Fill(phi);
       } // end loop of trks
+
       if(goodtrk_index.size()==0) continue; // no good trk, pass
 //	  cout << "cut1: " << goodtrk_index.size() << endl; 
       ++n_cut1;
       h_cutflow->Fill(1);
 
-/*		for(UInt_t i=0; i<hit_sector->size(); ++i) {
-			if( hit_measphi->at(i)==1 ) {
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==1) 
-					h_hit_sector10_layer1->Fill(-1.*hit_pstrip->at(i)); 
 
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==2) 
-					h_hit_sector10_layer2->Fill(-1.*hit_pstrip->at(i));
 
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==3) 
-					h_hit_sector10_layer3->Fill(-1.*hit_pstrip->at(i));
 
-				if(hit_sector->at(i)==10 && hit_wlay->at(i)==4) 
-					h_hit_sector10_layer4->Fill(-1.*hit_pstrip->at(i));
-			}
-				else{
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==1) 
-						h_hit_sector10_layer1->Fill(hit_pstrip->at(i));
-
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==2) 
-						h_hit_sector10_layer2->Fill(hit_pstrip->at(i));
-
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==3) 
-						h_hit_sector10_layer3->Fill(hit_pstrip->at(i));
-
-					if(hit_sector->at(i)==10 && hit_wlay->at(i)==4) 
-						h_hit_sector10_layer4->Fill(hit_pstrip->at(i));
-			}
-		}
+/*	  for(UInt_t i=0; i<goodtrk_index.size(); ++i)
+	  {
+			UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 	
+			for(UInt_t j=0; j<hit_sector->size(); ++j)
+	     	{
+				if(int(hit_sfit->at(j))==0) sfitNum++;   		
+		 	}
+			h_trk_sfit->Fill(sfitNum); 
+			cout << sfitNum << endl; //number of unspoiled hits on each track 			
+	  }		
 */
+
 
       // ===============================================================================================
 
@@ -278,8 +236,13 @@ void EffStudy::Loop()
          vector<double>::iterator lowPhiIndex;
          vector<double>::iterator lowEtaIndex;
 
+//		 UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 
+
          bool morethan2 = false; // if matched by more than 2 sectors
          for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
+
+//			if(int(hit_sfit->at(j))==0) sfitNum++;   
+
             if( hitToMuon->at(j)==goodtrk_index[i] ) {
                Double_t badphi = 0.; // to exclude mismatching
                if( hit_sector->at(j)<0 ) badphi = -(pi/15)*(2*hit_sector->at(j)+17);
@@ -290,6 +253,10 @@ void EffStudy::Loop()
                }
             }
          } // end loop of hits
+
+//		h_trk_sfit->Fill(sfitNum); 
+//		cout << sfitNum << endl; //number of unspoiled hits on each track 
+
          for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits again to find overlaped sector
             if( hitToMuon->at(j)==goodtrk_index[i] && hit_sector->at(j)!=sector && sector!=0 ) {
                Double_t badphi = 0.;
@@ -309,9 +276,9 @@ void EffStudy::Loop()
                if( TMath::Abs(badphi-goodtrk_phi[i]) > 0.7 && TMath::Abs(badphi+2*pi-goodtrk_phi[i]) > 0.7 ) {
                   morethan2trk_index.push_back(goodtrk_index[i]);
                   morethan2 = true;
-                  cout<<"ERROR: more than two matched sectors!"<<endl;
-                 cout<<"info: "<<goodtrk_index[i]<<"  "<<trkP->at(goodtrk_index[i])/1.e3<<"  "<<trkEta->at(goodtrk_index[i])<<"  "<<goodtrk_phi[i]<<endl;
-                  cout<<"      "<<sector<<"  "<<sector_2ndary<<"  "<<hit_sector->at(j)<<endl;
+//                  cout<<"ERROR: more than two matched sectors!"<<endl;
+ //                cout<<"info: "<<goodtrk_index[i]<<"  "<<trkP->at(goodtrk_index[i])/1.e3<<"  "<<trkEta->at(goodtrk_index[i])<<"  "<<goodtrk_phi[i]<<endl;
+ //                 cout<<"      "<<sector<<"  "<<sector_2ndary<<"  "<<hit_sector->at(j)<<endl;
                   break;
                }
             }
@@ -456,6 +423,21 @@ void EffStudy::Loop()
 //	  cout << "hitToMuon: " << hitToMuon->size() << endl; 
       ++n_cut2;
       h_cutflow->Fill(2);
+
+
+
+	  for(UInt_t i=0; i<matchedtrk_index.size(); ++i)
+	  {
+			UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 	
+			for(UInt_t j=0; j<hit_sector->size(); ++j)
+	     	{
+				if(int(hit_sfit->at(j))==0) sfitNum++;   		
+		 	}
+			h_trk_sfit->Fill(sfitNum); 
+			cout << sfitNum << endl; //number of unspoiled hits on each track 			
+	  }		
+
+
       // ===============================================================================================
 
       // ===============================================================================================
@@ -496,7 +478,7 @@ void EffStudy::Loop()
 			h2_eff_channel_onlyNumerator->Fill(-1.*hit_pstrip->at(i), fillnumber, 1);
 
 
-//			if(fillnumber==2.0)
+//			if(fillnumber==13.75)
 //				h_eff_channel_forOneLayer->Fill(-1.*hit_pstrip->at(i));  
 
 
@@ -704,6 +686,13 @@ n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
       for(UInt_t j=0; j<n_trkperchl[i].size(); ++j) {
          for(UInt_t k=0; k<n_trkperchl[i][j].size(); ++k) {
 
+		for(UInt_t m=0; m<secPhi.size(); ++m)
+		{
+			if(secPhi[m]==i && layerPhi[m]==j && channelPhi[m]==k)
+				--n_trkperchl[i][j][k];
+		}
+
+
             if( h2_eff_channel->GetBinContent( k+2, (i+1)*5+j+1 )!=0 ) {
                Double_t bincontent = h2_eff_channel->GetBinContent( k+2, (i+1)*5+j+1 );
                Double_t binerror = bincontent*(n_trkperchl[i][j][k]-bincontent)/TMath::Power(n_trkperchl[i][j][k], 3);
@@ -720,13 +709,39 @@ n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
       }
    }
 
+
+
+
+/*for(UInt_t k=0; k<48; ++k) {
+	if( h2_eff_channel->GetBinContent(k+2, 97)!=0) {
+		sum += h2_eff_channel->GetBinContent( k+2, 97);
+		count++;
+	}
+}
+*/
+
+/*for(UInt_t i=6; i<=169; ++i)
+{
+	Double_t sum=0.0;
+	UInt_t count= 0;
+	for(UInt_t k=0; k<48; ++k) {
+		if( h2_eff_channel->GetBinContent(k+2, i)!=0) {
+			sum += h2_eff_channel->GetBinContent( k+2, i);
+			count++;
+		}
+	}
+
+	cout << i << "	" << sum/count << endl; 
+
+}*/
+
 /*    Double_t sum=0.0;
 	UInt_t count= 0;  
-	for(UInt_t k=0; k<n_trkperchl[18][0].size(); ++k) {
+	for(UInt_t k=0; k<n_trkperchl[29][3].size(); ++k) {
 		if( h_eff_channel_forOneLayer->GetBinContent(k+2)!=0) {
 			Double_t bincontent = h_eff_channel_forOneLayer->GetBinContent(k+2);
-            Double_t binerror = bincontent*((n_trkperchl[18][0][k])-bincontent)/TMath::Power(n_trkperchl[18][0][k], 3);
-            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/(n_trkperchl[18][0][k]));
+            Double_t binerror = bincontent*((n_trkperchl[29][3][k])-bincontent)/TMath::Power(n_trkperchl[29][3][k], 3);
+            h_eff_channel_forOneLayer->SetBinContent( k+2, bincontent/(n_trkperchl[29][3][k]));
             h_eff_channel_forOneLayer->SetBinError( k+2, binerror );
 
 			sum += h_eff_channel_forOneLayer->GetBinContent(k+2);

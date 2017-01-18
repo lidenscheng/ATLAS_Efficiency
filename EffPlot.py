@@ -49,6 +49,8 @@ h2_eff_channel_onlyNumerator = inputfile.Get("eff_channel_numerator")
 
 #h_eff_channel_forOneLayer = inputfile.Get("eff_channel_forOneLayer") 
 
+h_trk_sfit = inputfile.Get("trk_sfit")
+
 
 #h_eta_cut0 = inputfile.Get("eta_cut0")
 #h_eta_cut1 = inputfile.Get("eta_cut1")
@@ -824,11 +826,28 @@ myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.eps")
 myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.png")
 myc.Close()
 
+
+myc= ROOT.TCanvas("myc", "myc", 800, 600)
+myc.SetMargin(0.12,0.075,0.12,0.075)
+h_trk_sfit.SetStats(ROOT.kFALSE)
+h_trk_sfit.SetTitle("Unspoiled hits")
+h_trk_sfit.GetXaxis().SetTitle("Number of unspoiled clusters in track")
+h_trk_sfit.GetYaxis().SetTitle("Number of tracks")
+h_trk_sfit.GetYaxis().SetTitleOffset(1.4)
+h_trk_sfit.GetYaxis().SetTitleSize(0.04)
+h_trk_sfit.GetXaxis().SetNdivisions(22)
+h_trk_sfit.Draw("HIST")
+myc.Update()
+myc.Update()
+myc.SaveAs("effplots/h_trk_sfit_2cuts.eps")
+myc.SaveAs("effplots/h_trk_sfit_2cuts.png")
+myc.Close()
+
 '''
 myc= ROOT.TCanvas("myc", "myc", 1200, 600)
 myc.SetMargin(0.06,0.03,0.1,0.1)
 h_eff_channel_forOneLayer.SetStats(ROOT.kFALSE)
-h_eff_channel_forOneLayer.SetTitle("Sector 2, Layer 1")
+h_eff_channel_forOneLayer.SetTitle("Sector 13, Layer 4")
 #h_eff_channel_forOneLayer.SetMaximum(1.)
 h_eff_channel_forOneLayer.SetFillColor(ROOT.kRed-9)
 h_eff_channel_forOneLayer.SetLineColor(ROOT.kRed+2)
@@ -846,8 +865,8 @@ myc.Update()
 #error_h_eff_channel_forOneLayer.SetFillColor(ROOT.kRed+2)
 #error_h_eff_channel_forOneLayer.Draw("2 SAME")
 myc.Update()
-myc.SaveAs("effplots/h_eff_channel_forOneLayer_Sec2Layer1_Phiredo.eps")
-myc.SaveAs("effplots/h_eff_channel_forOneLayer_Sec2Layer1_Phiredo.png")
+myc.SaveAs("effplots/outlierLayer13_4.eps")
+myc.SaveAs("effplots/outlierLayer13_4.png")
 myc.Close()
 '''
 
