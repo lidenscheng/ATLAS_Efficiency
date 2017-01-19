@@ -123,7 +123,8 @@ void EffStudy::Loop()
 
    TH2F * h2_eff_channel_onlyNumerator = new TH2F("eff_channel_numerator", "eff_channel_numerator", 242, -49, 193, 170, -17, 17);
 
-   TH1F * h_trk_sfit = new TH1F("trk_sfit", "trk_sfit", 22, 0, 21);
+   TH1F * h_trk_sfit_unspoiled = new TH1F("trk_sfit_unspoiled", "trk_sfit_unspoiled", 10, 0, 9);
+   TH1F * h_trk_sfit_spoiled = new TH1F("trk_sfit_spoiled", "trk_sfit_spoiled", 10, 0, 9);
 
 //   TH1F * h_eff_channel_forOneLayer = new TH1F("eff_channel_forOneLayer", "eff_channel_forOneLayer", 242, -49, 193); 
 
@@ -236,14 +237,16 @@ void EffStudy::Loop()
          vector<double>::iterator lowPhiIndex;
          vector<double>::iterator lowEtaIndex;
 
-//		 UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 
+//		UInt_t sfitNum = 0;
 
          bool morethan2 = false; // if matched by more than 2 sectors
          for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
 
-//			if(int(hit_sfit->at(j))==0) sfitNum++;   
-
             if( hitToMuon->at(j)==goodtrk_index[i] ) {
+
+//				if(int(hit_sfit->at(j))==0) sfitNum++;  
+//				cout << int(hit_sfit->at(j)) << endl; 
+ 
                Double_t badphi = 0.; // to exclude mismatching
                if( hit_sector->at(j)<0 ) badphi = -(pi/15)*(2*hit_sector->at(j)+17);
                else badphi = (pi/15)*(2*hit_sector->at(j)-17);
@@ -254,8 +257,8 @@ void EffStudy::Loop()
             }
          } // end loop of hits
 
-//		h_trk_sfit->Fill(sfitNum); 
-//		cout << sfitNum << endl; //number of unspoiled hits on each track 
+//			h_trk_sfit->Fill(sfitNum); 
+//			cout << sfitNum << endl; //number of unspoiled hits on each track 
 
          for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits again to find overlaped sector
             if( hitToMuon->at(j)==goodtrk_index[i] && hit_sector->at(j)!=sector && sector!=0 ) {
@@ -289,7 +292,7 @@ void EffStudy::Loop()
          if( sector!=0 && sector_2ndary!=0 && ( TMath::Abs(sector-sector_2ndary)==2 || TMath::Abs(sector-sector_2ndary)==14 ) ) continue; // abandon those have ill overlap
 
          if( sector!=0 ) { // if this good trk is matched with hits
-//			cout << "sector: " << sector << endl; 
+//		UInt_t sfitNum = 0;
             matchedtrk_index.push_back(goodtrk_index[i]);
             matchedtrk_phi.push_back(goodtrk_phi[i]);
             h_trk_sec->Fill(sector);
@@ -312,6 +315,8 @@ void EffStudy::Loop()
 
             for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
                if( hitToMuon->at(j)!=goodtrk_index[i] || hit_sector->at(j)!=sector ) continue;
+
+//				if(int(hit_sfit->at(j))==0) sfitNum++;  
 	
 	           ++n_trkperchl[sector+16][int(hit_wlay->at(j))-1][TMath::Power(-1, int(hit_measphi->at(j)))*int(hit_pstrip->at(j))+48]; //n_trkperchl[sector#][layer#][channel#], conversion rule down below 
 
@@ -328,12 +333,17 @@ void EffStudy::Loop()
                }
             } // end loop of hits
 
+//			h_trk_sfit->Fill(sfitNum); 
+//			cout << sfitNum << endl; //number of unspoiled hits on each track
+
 		
             if( avgchlphi!=0) avgchlphi = int(avgchlphi/n_chlphi); 
             if( avgchleta!=0) avgchleta = int(avgchleta/n_chleta);
 			 
 
             for(UInt_t j=0; j<layer_phi.size(); ++j) { // loop over all phi layers, accumulate the denominator
+
+//				cout << "Event: "<<jentry <<"	" << "track " << i << "	" << "hit " << j << "	" << "sfit= " << int(hit_sfit->at(j)) << endl; 	
 
                if( layer_phi[j]==0 ) 
 				{	
@@ -350,6 +360,7 @@ void EffStudy::Loop()
 					++n_trkperchl[sector+16][j][avgchleta+48];
 
 				}
+//				cout << "Event: "<<jentry <<"	" << "track " << i << "	" << "hit " << j << "	" << "sfit= " << int(hit_sfit->at(j)) << endl; 	
 					
          	}
 		
@@ -365,6 +376,7 @@ void EffStudy::Loop()
 
 
          if( sector_2ndary!=0 ) { // if has overlap, this good trk is counted twice
+//		UInt_t sfitNum = 0;
             h_overlap->Fill(TMath::Abs(sector-sector_2ndary));
             h_trk_sec->Fill(sector_2ndary);
             h2_trk_sec_phi->Fill(sector_2ndary, goodtrk_phi[i]);
@@ -383,6 +395,8 @@ void EffStudy::Loop()
             for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
                if( hitToMuon->at(j)!=goodtrk_index[i] || hit_sector->at(j)!=sector_2ndary ) continue;
 
+//				if(int(hit_sfit->at(j))==0) sfitNum++;  
+
 				++n_trkperchl[sector_2ndary+16][int(hit_wlay->at(j))-1][TMath::Power(-1, int(hit_measphi->at(j)))*int(hit_pstrip->at(j))+48];
 				
                if( hit_measphi->at(j)==1 ) {
@@ -397,6 +411,9 @@ void EffStudy::Loop()
 
                }
             }
+
+//			h_trk_sfit->Fill(sfitNum); 
+//			cout << sfitNum << endl; //number of unspoiled hits on each track
 
             if( avgchlphi!=0) avgchlphi = int(avgchlphi/n_chlphi);
             if( avgchleta!=0) avgchleta = int(avgchleta/n_chleta);
@@ -425,19 +442,40 @@ void EffStudy::Loop()
       h_cutflow->Fill(2);
 
 
+//cout << matchedtrk_index.size() << "	" << hit_sector->size() << endl; 
 
-	  for(UInt_t i=0; i<matchedtrk_index.size(); ++i)
+/*	  for(UInt_t i=0; i<matchedtrk_index.size(); ++i)
 	  {
-			UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 	
+//			UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 	
 			for(UInt_t j=0; j<hit_sector->size(); ++j)
 	     	{
-				if(int(hit_sfit->at(j))==0) sfitNum++;   		
+//				if(int(hit_sfit->at(j))==0) sfitNum++;   
+				cout << "Event: "<<jentry <<"	" << "track " << i << "	" << "hit " << j << "	" << "sfit= " << int(hit_sfit->at(j)) << endl; 	
 		 	}
-			h_trk_sfit->Fill(sfitNum); 
-			cout << sfitNum << endl; //number of unspoiled hits on each track 			
+//			h_trk_sfit->Fill(sfitNum); 
+//			cout << sfitNum << endl; //number of unspoiled hits on each track 			
 	  }		
+*/
 
+         for(UInt_t i=0; i<matchedtrk_index.size(); ++i) {// loop over matched trks
+			UInt_t sfitUnspoiled = 0; 
+			UInt_t sfitSpoiled = 0; 
 
+         	for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
+
+           		if( hitToMuon->at(j)==matchedtrk_index[i] ) {
+
+//					cout <<  int(hit_sfit->at(j)) << endl;
+					if(int(hit_sfit->at(j))==0) sfitUnspoiled++;  
+					if(int(hit_sfit->at(j))!=0) sfitSpoiled++;    
+//					h_trk_sfit->Fill(int(hit_sfit->at(j))); 
+ 					}
+			}
+
+			h_trk_sfit_unspoiled->Fill(sfitUnspoiled); 
+			h_trk_sfit_spoiled->Fill(sfitSpoiled); 
+			cout << sfitUnspoiled << "	" << sfitSpoiled << endl; 	
+		}
       // ===============================================================================================
 
       // ===============================================================================================
@@ -477,6 +515,8 @@ void EffStudy::Loop()
             h2_eff_channel->Fill(-1.*hit_pstrip->at(i), fillnumber, 1);
 			h2_eff_channel_onlyNumerator->Fill(-1.*hit_pstrip->at(i), fillnumber, 1);
 
+//			cout << "Event: "<<jentry << "	" << "hit " << i << "	" << "sfit= " << int(hit_sfit->at(i)) << endl; 	
+
 
 //			if(fillnumber==13.75)
 //				h_eff_channel_forOneLayer->Fill(-1.*hit_pstrip->at(i));  
@@ -513,6 +553,8 @@ void EffStudy::Loop()
 
 		        h2_eff_channel->Fill(hit_pstrip->at(i), fillnumber, 1);
 				h2_eff_channel_onlyNumerator->Fill(hit_pstrip->at(i), fillnumber, 1);
+
+//			    cout << "Event: "<<jentry << "	" << "hit " << i << "	" << "sfit= " << int(hit_sfit->at(i)) << endl; 	
 
 //			    if(fillnumber == 15.25)
 //					h_eff_channel_forOneLayer->Fill(hit_pstrip->at(i));
@@ -564,21 +606,9 @@ void EffStudy::Loop()
      } // end loop of hits
 
 
-
-
       // ===============================================================================================
 
 } // end loop of events
-
-/*n_trkpersec_phi_good[3]= n_trkpersec_phi_good[3]-24;
-n_trkpersec_phi_good[18]= n_trkpersec_phi_good[18]-12;
-n_trkpersec_phi_good[19]= n_trkpersec_phi_good[19]-12;
-n_trkpersec_phi_good[22]= n_trkpersec_phi_good[22]-12;
-n_trkpersec_phi_good[24]= n_trkpersec_phi_good[24]-12;
-n_trkpersec_phi_good[26]= n_trkpersec_phi_good[26]-12;
-n_trkpersec_phi_good[28]= n_trkpersec_phi_good[28]-12;
-n_trkpersec_phi_good[30]= n_trkpersec_phi_good[30]-12;
-*/
 
    // sector # | vector i | bin # (big block, block i is bin (i-1)*5+1~i*5)
    //   1~16   |  17~32   | 19~34
