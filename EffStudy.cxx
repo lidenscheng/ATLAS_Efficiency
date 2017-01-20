@@ -20,31 +20,18 @@ void EffStudy::Loop()
 
    ifstream inputPhi ("PhiExcludeList.dat", ifstream::in);
    ifstream inputEta ("EtaExcludeList.dat", ifstream::in);
-//   ifstream inputStuck("exclude.dat", ifstream::in);
-//   ifstream inputAll("allExclude.dat", ifstream::in);
 
-//   vector<UInt_t> secVectorStuck, layerVectorStuck, channelVectorStuck;
-//   vector<UInt_t> secVectorAll, layerVectorAll, channelVectorAll;
+   ifstream inputEtaEffLayer("output.txt_eta", ifstream::in); 
+
    vector<UInt_t> secPhi, secEta; 
    vector<UInt_t> layerPhi, layerEta;
    vector<UInt_t> channelPhi, channelEta; 
    UInt_t sec, layer, channel;  
 
-/*   while(inputStuck >> sec >> layer >> channel)
-   	{
-		secVectorStuck.push_back(sec);
-		layerVectorStuck.push_back(layer);
-		channelVectorStuck.push_back(channel);
-   }
-
-   while(inputAll >> sec >> layer >> channel)
-   	{
-		secVectorAll.push_back(sec);
-		layerVectorAll.push_back(layer);
-		channelVectorAll.push_back(channel);
-   }
-*/
-
+   vector<UInt_t> binVector;
+   vector<Double_t> effVector; 
+   UInt_t bin;
+   Double_t eff; 
 
    while(inputPhi >> sec >> layer >> channel)
    	{
@@ -61,6 +48,12 @@ void EffStudy::Loop()
 		layerEta.push_back(layer);
 		channelEta.push_back(channel);
    }
+
+  while(inputEtaEffLayer >> bin >> eff)
+  {	
+		binVector.push_back(bin);
+		effVector.push_back(eff);
+  }
 
 
    
@@ -123,8 +116,9 @@ void EffStudy::Loop()
 
    TH2F * h2_eff_channel_onlyNumerator = new TH2F("eff_channel_numerator", "eff_channel_numerator", 242, -49, 193, 170, -17, 17);
 
-   TH1F * h_trk_sfit_unspoiled = new TH1F("trk_sfit_unspoiled", "trk_sfit_unspoiled", 10, 0, 9);
-   TH1F * h_trk_sfit_spoiled = new TH1F("trk_sfit_spoiled", "trk_sfit_spoiled", 10, 0, 9);
+//   TH1F * h_trk_sfit_unspoiled = new TH1F("trk_sfit_unspoiled", "trk_sfit_unspoiled", 9, 0, 8);
+//   TH1F * h_trk_sfit_spoiled = new TH1F("trk_sfit_spoiled", "trk_sfit_spoiled", 9, 0, 8);
+//   TH2F * h2_trk_sfit_both = new TH2F("trk_sfit_both", "trk_sfit_both", 9, 0, 8, 9, 0, 8); 
 
 //   TH1F * h_eff_channel_forOneLayer = new TH1F("eff_channel_forOneLayer", "eff_channel_forOneLayer", 242, -49, 193); 
 
@@ -207,20 +201,26 @@ void EffStudy::Loop()
       h_cutflow->Fill(1);
 
 
+//count up unspoiled and spoiled hits on each track 
+/*        	for(UInt_t i=0; i<goodtrk_index.size(); ++i) {
+			UInt_t sfitUnspoiled = 0; 
+			UInt_t sfitSpoiled = 0; 
 
+         	for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
 
-/*	  for(UInt_t i=0; i<goodtrk_index.size(); ++i)
-	  {
-			UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 	
-			for(UInt_t j=0; j<hit_sector->size(); ++j)
-	     	{
-				if(int(hit_sfit->at(j))==0) sfitNum++;   		
-		 	}
-			h_trk_sfit->Fill(sfitNum); 
-			cout << sfitNum << endl; //number of unspoiled hits on each track 			
-	  }		
+           		if(hitToMuon->at(j)==goodtrk_index[i] && hit_measphi->at(j)==0) {  //don't need phi hits, only need eta hits 
+
+					if(int(hit_sfit->at(j))==0) sfitUnspoiled++;  
+					if(int(hit_sfit->at(j))!=0) sfitSpoiled++;    
+ 					}
+			}
+
+			h_trk_sfit_unspoiled->Fill(sfitUnspoiled); 
+			h_trk_sfit_spoiled->Fill(sfitSpoiled); 
+			h2_trk_sfit_both->Fill(sfitUnspoiled, sfitSpoiled); 
+//			cout << sfitUnspoiled << "	" << sfitSpoiled << endl; 	
+		}
 */
-
 
       // ===============================================================================================
 
@@ -442,40 +442,25 @@ void EffStudy::Loop()
       h_cutflow->Fill(2);
 
 
-//cout << matchedtrk_index.size() << "	" << hit_sector->size() << endl; 
-
-/*	  for(UInt_t i=0; i<matchedtrk_index.size(); ++i)
-	  {
-//			UInt_t sfitNum = 0; //counting hit that has spoil flag as 0, sfit=0 meaning unspoiled cluster 	
-			for(UInt_t j=0; j<hit_sector->size(); ++j)
-	     	{
-//				if(int(hit_sfit->at(j))==0) sfitNum++;   
-				cout << "Event: "<<jentry <<"	" << "track " << i << "	" << "hit " << j << "	" << "sfit= " << int(hit_sfit->at(j)) << endl; 	
-		 	}
-//			h_trk_sfit->Fill(sfitNum); 
-//			cout << sfitNum << endl; //number of unspoiled hits on each track 			
-	  }		
-*/
-
-         for(UInt_t i=0; i<matchedtrk_index.size(); ++i) {// loop over matched trks
+//count up spoiled and unspoiled hits for each track 
+/*         for(UInt_t i=0; i<matchedtrk_index.size(); ++i) {// loop over matched trks
 			UInt_t sfitUnspoiled = 0; 
 			UInt_t sfitSpoiled = 0; 
 
          	for(UInt_t j=0; j<hit_sector->size(); ++j) { // loop over hits
 
-           		if( hitToMuon->at(j)==matchedtrk_index[i] ) {
+           		if(hitToMuon->at(j)==matchedtrk_index[i] && hit_measphi->at(j)==0) {  //don't need phi hits, only need eta hits 
 
-//					cout <<  int(hit_sfit->at(j)) << endl;
 					if(int(hit_sfit->at(j))==0) sfitUnspoiled++;  
 					if(int(hit_sfit->at(j))!=0) sfitSpoiled++;    
-//					h_trk_sfit->Fill(int(hit_sfit->at(j))); 
  					}
 			}
 
 			h_trk_sfit_unspoiled->Fill(sfitUnspoiled); 
 			h_trk_sfit_spoiled->Fill(sfitSpoiled); 
-			cout << sfitUnspoiled << "	" << sfitSpoiled << endl; 	
-		}
+			h2_trk_sfit_both->Fill(sfitUnspoiled, sfitSpoiled); 
+//			cout << sfitUnspoiled << "	" << sfitSpoiled << endl; 	
+		}*/
       // ===============================================================================================
 
       // ===============================================================================================
@@ -616,21 +601,6 @@ void EffStudy::Loop()
    for(UInt_t i=0; i<n_trkpersec.size(); ++i) { // normalization
       for(UInt_t j=0; j<4; ++j) {
 
-/*		for(UInt_t m=0; m<secPhi.size(); ++m)
-		{
-			if(secPhi[m]==i && layerPhi[m]==j)
-				--n_trkpersec_phi_good[i];
-		}
-
-
-		for(UInt_t m=0; m<secEta.size(); ++m)
-		{
-			if(secEta[m]==i && layerEta[m]==j)
-				--n_trkpersec_eta_good[i];
-		}
-
-*/
-
          if( h_eff_phi->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_phi->GetBinContent((i+1)*5+j+1);
             Double_t binerror = bincontent*(n_trkpersec[i]-bincontent)/TMath::Power(n_trkpersec[i], 3);
@@ -645,8 +615,6 @@ void EffStudy::Loop()
             h_eff_phi_good->SetBinError((i+1)*5+j+1, binerror);
          }
 
-
-//		cout << i << "	" << j <<"	" << (i+1)*5+j+1 << endl; 
 
          if( h_eff_eta->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_eta->GetBinContent((i+1)*5+j+1);
@@ -667,6 +635,7 @@ void EffStudy::Loop()
       }
    }
 
+//update phi eff per layer by taking out stuck-bit groups and only averaging over leftover channels 
 	h_eff_phi_good->SetBinContent(24,0.623524);
 	h_eff_phi_good->SetBinContent(96,0.894479);
 	h_eff_phi_good->SetBinContent(102,0.883518);
@@ -677,35 +646,11 @@ void EffStudy::Loop()
 	h_eff_phi_good->SetBinContent(157,0.919011);
 
 
-	h_eff_eta_good->SetBinContent(6, 0.955338 );
-	h_eff_eta_good->SetBinContent(9, 0.941297);
-	h_eff_eta_good->SetBinContent(12, 0.960298);
-	h_eff_eta_good->SetBinContent(13, 0.953697);
-	h_eff_eta_good->SetBinContent(22, 0.960233);
-	h_eff_eta_good->SetBinContent(29, 0.942148);
-	h_eff_eta_good->SetBinContent(31, 0.939378);
-	h_eff_eta_good->SetBinContent(32, 0.961111);
-	h_eff_eta_good->SetBinContent(48, 0.953389);
-	h_eff_eta_good->SetBinContent(57, 0.951936);
-	h_eff_eta_good->SetBinContent(64, 0.952642);
-	h_eff_eta_good->SetBinContent(67, 0.955779);
-	h_eff_eta_good->SetBinContent(68, 0.947896);
-	h_eff_eta_good->SetBinContent(82, 0.856703);
-	h_eff_eta_good->SetBinContent(93, 0.964378);
-	h_eff_eta_good->SetBinContent(97, 0.953036);
-	h_eff_eta_good->SetBinContent(103, 0.934327);
-	h_eff_eta_good->SetBinContent(106, 0.956811);
-	h_eff_eta_good->SetBinContent(119, 0.949496);
-	h_eff_eta_good->SetBinContent(121, 0.970233);
-	h_eff_eta_good->SetBinContent(127, 0.95531);
-	h_eff_eta_good->SetBinContent(134, 0.965639);
-	h_eff_eta_good->SetBinContent(136, 0.944927);
-	h_eff_eta_good->SetBinContent(142, 0.963378);
-	h_eff_eta_good->SetBinContent(146, 0.954475);
-	h_eff_eta_good->SetBinContent(148, 0.954664);
-	h_eff_eta_good->SetBinContent(152, 0.948533);
-	h_eff_eta_good->SetBinContent(153, 0.954274);
-	h_eff_eta_good->SetBinContent(162, 0.961966);
+//update eff per layer by taking out stuck-bit groups and only averaging over channels 50-180 
+    for(UInt_t i=0; i<binVector.size(); ++i)
+	{
+		h_eff_eta_good->SetBinContent(binVector[i], effVector[i]);
+	}
 
 
 
