@@ -116,9 +116,9 @@ void EffStudy::Loop()
 
    TH2F * h2_eff_channel_onlyNumerator = new TH2F("eff_channel_numerator", "eff_channel_numerator", 242, -49, 193, 170, -17, 17);
 
-//   TH1F * h_trk_sfit_unspoiled = new TH1F("trk_sfit_unspoiled", "trk_sfit_unspoiled", 9, 0, 8);
-//   TH1F * h_trk_sfit_spoiled = new TH1F("trk_sfit_spoiled", "trk_sfit_spoiled", 9, 0, 8);
-//   TH2F * h2_trk_sfit_both = new TH2F("trk_sfit_both", "trk_sfit_both", 9, 0, 8, 9, 0, 8); 
+   TH1F * h_trk_sfit_unspoiled = new TH1F("trk_sfit_unspoiled", "trk_sfit_unspoiled", 9, -0.5, 8.5);
+   TH1F * h_trk_sfit_spoiled = new TH1F("trk_sfit_spoiled", "trk_sfit_spoiled", 9, -0.5, 8.5);
+   TH2F * h2_trk_sfit_both = new TH2F("trk_sfit_both", "trk_sfit_both", 9, -0.5, 8.5, 9, -0.5, 8.5); 
 
 //   TH1F * h_eff_channel_forOneLayer = new TH1F("eff_channel_forOneLayer", "eff_channel_forOneLayer", 242, -49, 193); 
 
@@ -443,7 +443,7 @@ void EffStudy::Loop()
 
 
 //count up spoiled and unspoiled hits for each track 
-/*         for(UInt_t i=0; i<matchedtrk_index.size(); ++i) {// loop over matched trks
+         for(UInt_t i=0; i<matchedtrk_index.size(); ++i) {// loop over matched trks
 			UInt_t sfitUnspoiled = 0; 
 			UInt_t sfitSpoiled = 0; 
 
@@ -459,8 +459,8 @@ void EffStudy::Loop()
 			h_trk_sfit_unspoiled->Fill(sfitUnspoiled); 
 			h_trk_sfit_spoiled->Fill(sfitSpoiled); 
 			h2_trk_sfit_both->Fill(sfitUnspoiled, sfitSpoiled); 
-//			cout << sfitUnspoiled << "	" << sfitSpoiled << endl; 	
-		}*/
+			cout << sfitUnspoiled << "	" << sfitSpoiled << endl; 	
+		}
       // ===============================================================================================
 
       // ===============================================================================================
