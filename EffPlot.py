@@ -44,14 +44,15 @@ h_eff_eta_good = inputfile.Get("eff_eta_good")
 
 h2_eff_channel = inputfile.Get("eff_channel")
 h2_eff_channel_onlyNumerator = inputfile.Get("eff_channel_numerator")
+
 #h2_eta_eff_layer_eta_regions = inputfile.Get("eta_eff_layer_eta_regions")
 #h2_eta_eff_layer_etaValue = inputfile.Get("eta_eff_layer_etaValue")
 
 #h_eff_channel_forOneLayer = inputfile.Get("eff_channel_forOneLayer") 
 
-h_trk_sfit_unspoiled = inputfile.Get("trk_sfit_unspoiled")
-h_trk_sfit_spoiled = inputfile.Get("trk_sfit_spoiled")
-h2_trk_sfit_both = inputfile.Get("trk_sfit_both") 
+#h_trk_sfit_unspoiled = inputfile.Get("trk_sfit_unspoiled")
+#h_trk_sfit_spoiled = inputfile.Get("trk_sfit_spoiled")
+#h2_trk_sfit_both = inputfile.Get("trk_sfit_both") 
 
 
 #h_eta_cut0 = inputfile.Get("eta_cut0")
@@ -63,13 +64,21 @@ h2_trk_sfit_both = inputfile.Get("trk_sfit_both")
 #h_hit_sector10_layer3 = inputfile.Get("hit_sector10_layer3") 
 #h_hit_sector10_layer4 = inputfile.Get("hit_sector10_layer4") 
 
+#h_eta_eff_normal_layers = inputfile.Get("h_eta_eff_normal_layers")
+#h_eta_eff_-60V_layers = inputfile.Get("h_eta_eff_-60V_layers") 
+
+#h2_qpeak_channelNumber = inputfile.Get("qpeak_channelNumber") 
+
+h_channel_segment = inputfile.Get("channel_segment") 
+
+
 layers = []
 mpv = []
 
 for i in range(-16,17):
 	for j in range(1,5):
-		myhist = inputfile.Get("qsum_sector_%d_layer_%d" % (i, j))
-#		myhist = inputfile.Get("qpeak_sector_%d_layer_%d" % (i, j))
+#		myhist = inputfile.Get("qsum_sector_%d_layer_%d" % (i, j))
+		myhist = inputfile.Get("qpeak_sector_%d_layer_%d" % (i, j))
 		if myhist == None: 
 			layer= i+0.25*(j-1.0) 
 			layers.append(float(layer))
@@ -87,8 +96,8 @@ for i in range(-16,17):
 		myhist.GetYaxis().SetTitle("Events")
 		myhist.GetYaxis().SetTitleOffset(1.4)
 		myhist.GetYaxis().SetTitleSize(0.04)
-		myhist.GetXaxis().SetTitle("qsum")
-#		myhist.GetXaxis().SetTitle("qpeak")
+#		myhist.GetXaxis().SetTitle("qsum")
+		myhist.GetXaxis().SetTitle("qpeak")
 		myhist.Draw()
 
 		fit_x = TF1("fit_x", "landau", 0., 6000000.)
@@ -104,10 +113,10 @@ for i in range(-16,17):
 
 		myc.Update()
 
-		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.eps" % (i,j))
-#		myc.SaveAs("effplots/qpeak/qpeak_sector_%d_layer_%d.eps" % (i,j))
-		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.png" % (i,j))
-#		myc.SaveAs("effplots/qpeak/qpeak_sector_%d_layer_%d.png" % (i,j))
+#		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.eps" % (i,j))
+		myc.SaveAs("effplots/qpeak/qpeak_sector_%d_layer_%d.eps" % (i,j))
+#		myc.SaveAs("effplots/qsum_sector_%d_layer_%d.png" % (i,j))
+		myc.SaveAs("effplots/qpeak/qpeak_sector_%d_layer_%d.png" % (i,j))
 
 		myc.Close()
 
@@ -270,6 +279,9 @@ graphLower60 = ROOT.TGraph(len(phi_eff_lower60), mpv_60, phi_eff_lower60)
 graphLower140 = ROOT.TGraph(len(phi_eff_lower140), mpv_140, phi_eff_lower140)
 graphLower200 = ROOT.TGraph(len(phi_eff_lower200), mpv_200, phi_eff_lower200)
 
+#print graphNormal.GetMean(2), graphNormal.GetRMS(2)
+#print graphLower60.GetMean(2), graphLower60.GetRMS(2)
+
 graphNormal.SetMarkerColor(kBlue)
 graphLower60.SetMarkerColor(kRed)
 graphLower140.SetMarkerColor(kBlack)
@@ -338,6 +350,9 @@ graphNormalEta = ROOT.TGraph(len(eta_eff_normal), mpvNormal, eta_eff_normal)
 graphLower60Eta = ROOT.TGraph(len(eta_eff_lower60), mpv_60, eta_eff_lower60)
 graphLower140Eta = ROOT.TGraph(len(eta_eff_lower140), mpv_140, eta_eff_lower140)
 graphLower200Eta = ROOT.TGraph(len(eta_eff_lower200), mpv_200, eta_eff_lower200)
+
+#print graphNormalEta.GetMean(2), graphNormalEta.GetRMS(2)
+#print graphLower60Eta.GetMean(2), graphLower60Eta.GetRMS(2)
 
 graphNormalEta.SetMarkerColor(kBlue)
 graphLower60Eta.SetMarkerColor(kRed)
@@ -923,7 +938,6 @@ myc.SaveAs("effplots/h_eff_phi.eps")
 myc.SaveAs("effplots/h_eff_phi.png")
 myc.Close()
 
-
 myc= ROOT.TCanvas("myc", "myc", 1200, 600)
 myc.SetMargin(0.06,0.03,0.1,0.075)
 h_eff_phi_good.SetStats(ROOT.kFALSE)
@@ -1028,6 +1042,8 @@ myc.SaveAs("effplots/h2_eff_channel.eps")
 myc.SaveAs("effplots/h2_eff_channel.png")
 myc.Close()
 
+
+
 myc= ROOT.TCanvas("myc", "myc", 1000, 800)
 myc.SetMargin(0.08,0.15,0.1,0.03)
 h2_eff_channel_onlyNumerator.SetStats(ROOT.kFALSE)
@@ -1038,6 +1054,7 @@ h2_eff_channel_onlyNumerator.GetYaxis().SetTitleOffset(0.9)
 h2_eff_channel_onlyNumerator.GetYaxis().SetTitleSize(0.04)
 h2_eff_channel_onlyNumerator.GetZaxis().SetTitle("Hits")
 h2_eff_channel_onlyNumerator.GetZaxis().SetTitleOffset(1.3)
+h2_eff_channel_onlyNumerator.GetXaxis().SetRangeUser(-49, 0)
 h2_eff_channel_onlyNumerator.Draw("COLZ0")
 myc.Update()
 myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.eps")
@@ -1045,6 +1062,47 @@ myc.SaveAs("effplots/h2_eff_channel_onlyNumerator.png")
 myc.Close()
 
 
+
+
+myc= ROOT.TCanvas("myc", "myc", 800, 600)
+myc.SetMargin(0.12,0.05,0.1,0.05)
+h_channel_segment.SetStats(ROOT.kFALSE)
+h_channel_segment.SetTitle("")
+h_channel_segment.GetXaxis().SetTitle("Segment strip number")
+h_channel_segment.GetYaxis().SetTitle("Events")
+h_channel_segment.GetYaxis().SetTitleOffset(1.4)
+h_channel_segment.GetYaxis().SetTitleSize(0.04)
+h_channel_segment.Draw()
+myc.Update()
+myc.SaveAs("effplots/h_channel_segment.eps")
+myc.SaveAs("effplots/h_channel_segment.png")
+myc.Close()
+
+
+
+
+'''
+myc= ROOT.TCanvas("myc", "myc", 1200, 800)
+myc.SetMargin(0.15,0.15,0.1,0.1)
+h2_qpeak_channelNumber.SetStats(ROOT.kFALSE)
+h2_qpeak_channelNumber.SetTitle("Sector -13, Layer 4")
+h2_qpeak_channelNumber.GetXaxis().SetTitle("Channel number [GeV]")
+h2_qpeak_channelNumber.GetYaxis().SetTitle("Center Strip Amplitude (qpeak)")
+h2_qpeak_channelNumber.GetYaxis().SetTitleOffset(1.3)
+h2_qpeak_channelNumber.GetYaxis().SetTitleSize(0.04)
+h2_qpeak_channelNumber.GetZaxis().SetTitle("Hits")
+h2_qpeak_channelNumber.GetZaxis().SetTitleOffset(1.3)
+h2_qpeak_channelNumber.Draw("COLZ0")
+#h2_qpeak_channelNumber.GetYaxis().SetRangeUser(0., 100000.)
+myc.Update()
+myc.SaveAs("effplots/h2_qpeak_channelNumber_sector-13_Layer4_test.eps")
+#myc.SaveAs("effplots/h2_qpeak_channelNumber_sector-2_Layer4_upTo100K.eps")
+myc.SaveAs("effplots/h2_qpeak_channelNumber_sector-13_Layer4_test.png")
+#myc.SaveAs("effplots/h2_qpeak_channelNumber_sector-2_Layer4_upTo100K.png")
+myc.Close()
+'''
+
+'''
 myc= ROOT.TCanvas("myc", "myc", 800, 600)
 myc.SetMargin(0.12,0.075,0.12,0.075)
 h_trk_sfit_unspoiled.SetStats(ROOT.kFALSE)
@@ -1097,7 +1155,47 @@ myc.Update()
 myc.SaveAs("effplots/h2_trk_sfit_both_2cuts.eps")
 myc.SaveAs("effplots/h2_trk_sfit_both_2cuts.png")
 myc.Close()
+'''
+'''
+myc= ROOT.TCanvas("myc", "myc", 1200, 600)
+myc.SetMargin(0.06,0.03,0.1,0.075)
+#h_eta_eff_normal_layers.SetStats(ROOT.kFALSE)
+h_eta_eff_normal_layers.SetTitle("Normal Layers")
+#h_eta_eff_normal_layers.SetMaximum(1.)
+h_eta_eff_normal_layers.SetFillColor(ROOT.kRed-9)
+h_eta_eff_normal_layers.SetLineColor(ROOT.kRed+2)
+h_eta_eff_normal_layers.GetXaxis().SetTitle("Eta Layer Efficiency")
+#h_eta_eff_normal_layers.GetXaxis().SetNdivisions(134)
+#h_eta_eff_normal_layers.GetYaxis().SetTitle("Eta Efficiency")
+h_eta_eff_normal_layers.GetYaxis().SetTitleOffset(0.7)
+h_eta_eff_normal_layers.GetYaxis().SetTitleSize(0.04)
+h_eta_eff_normal_layers.Draw("HIST")
+myc.Update()
+myc.Update()
+myc.SaveAs("effplots/h_eta_eff_normal_layers.eps")
+myc.SaveAs("effplots/h_eta_eff_normal_layers.png")
+myc.Close()
 
+
+myc= ROOT.TCanvas("myc", "myc", 1200, 600)
+myc.SetMargin(0.06,0.03,0.1,0.075)
+#h_eta_eff_-60V_layers.SetStats(ROOT.kFALSE)
+h_eta_eff_-60V_layers.SetTitle("Normal Layers")
+#h_eta_eff_normal_layers.SetMaximum(1.)
+h_eta_eff_-60V_layers.SetFillColor(ROOT.kRed-9)
+h_eta_eff_-60V_layers.SetLineColor(ROOT.kRed+2)
+h_eta_eff_-60V_layers.GetXaxis().SetTitle("Eta Layer Efficiency")
+#h_eta_eff_normal_layers.GetXaxis().SetNdivisions(134)
+#h_eta_eff_normal_layers.GetYaxis().SetTitle("Eta Efficiency")
+h_eta_eff_-60V_layers.GetYaxis().SetTitleOffset(0.7)
+h_eta_eff_-60V_layers.GetYaxis().SetTitleSize(0.04)
+h_eta_eff_-60V_layers.Draw("HIST")
+myc.Update()
+myc.Update()
+myc.SaveAs("effplots/h_eta_eff_-60V_layers.eps")
+myc.SaveAs("effplots/h_eta_eff_-60V_layers.png")
+myc.Close()
+'''
 
 '''
 myc= ROOT.TCanvas("myc", "myc", 1200, 600)
