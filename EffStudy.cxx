@@ -18,16 +18,16 @@ void EffStudy::Loop()
    TFile *outputfile;
    outputfile = TFile::Open( outputname, "RECREATE" );
 
-   ifstream inputPhi ("PhiExcludeList.dat", ifstream::in);
+/*   ifstream inputPhi ("PhiExcludeList.dat", ifstream::in);
    ifstream inputEta ("EtaExcludeList.dat", ifstream::in);
 
    ifstream inputEtaEffLayer("output.txt_eta", ifstream::in); 
-
+*/
 
 //   ifstream inputEtaEffNormalLayers("etaEffNormalLayers.txt", ifstream::in);
 //   ifstream inputEtaLowerLayers("etaEff-60VLayer.txt", ifstream::in); 
 
-   vector<UInt_t> secPhi, secEta; 
+/*   vector<UInt_t> secPhi, secEta; 
    vector<UInt_t> layerPhi, layerEta;
    vector<UInt_t> channelPhi, channelEta; 
    UInt_t sec, layer, channel;  
@@ -36,11 +36,12 @@ void EffStudy::Loop()
    vector<Double_t> effVector; 
    UInt_t bin;
    Double_t eff; 
+*/
 
 //   vector<Double_t> normalLayersEff, loweredLayersEff;
 //   Double_t normalEff, loweredEff; 
 
-   while(inputPhi >> sec >> layer >> channel)
+/*   while(inputPhi >> sec >> layer >> channel)
    	{
 
 		secPhi.push_back(sec);
@@ -61,6 +62,7 @@ void EffStudy::Loop()
 		binVector.push_back(bin);
 		effVector.push_back(eff);
   }
+*/
 
 /*
   while(inputEtaEffNormalLayers >> normalEff)
@@ -636,7 +638,7 @@ Fill(hit_pstrip->at(i), fillnumber, 1);
          if( h_eff_phi_good->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_phi_good->GetBinContent((i+1)*5+j+1);
             Double_t binerror = bincontent*(n_trkpersec[i]-bincontent)/TMath::Power(n_trkpersec[i], 3);
-	    h_eff_phi_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec[i]);
+	        h_eff_phi_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec[i]);
             h_eff_phi_good->SetBinError((i+1)*5+j+1, binerror);
          }
 
@@ -651,7 +653,7 @@ Fill(hit_pstrip->at(i), fillnumber, 1);
          if( h_eff_eta_good->GetBinContent((i+1)*5+j+1)!=0 ) {
             Double_t bincontent = h_eff_eta_good->GetBinContent((i+1)*5+j+1);
             Double_t binerror = bincontent*(n_trkpersec[i]-bincontent)/TMath::Power(n_trkpersec[i], 3);
-	    h_eff_eta_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec[i]);
+	        h_eff_eta_good->SetBinContent((i+1)*5+j+1, bincontent/n_trkpersec[i]);
             h_eff_eta_good->SetBinError((i+1)*5+j+1, binerror);
          }
 
@@ -661,21 +663,51 @@ Fill(hit_pstrip->at(i), fillnumber, 1);
    }
 
 //update phi eff per layer by taking out stuck-bit groups and only averaging over leftover channels 
-	h_eff_phi_good->SetBinContent(24,0.623524);
-	h_eff_phi_good->SetBinContent(96,0.894479);
-	h_eff_phi_good->SetBinContent(102,0.883518);
-	h_eff_phi_good->SetBinContent(117,0.869061);
-	h_eff_phi_good->SetBinContent(127,0.917901);
-	h_eff_phi_good->SetBinContent(139,0.898584);
-	h_eff_phi_good->SetBinContent(147,0.920643);
-	h_eff_phi_good->SetBinContent(157,0.919011);
+	h_eff_phi_good->SetBinContent(24,0.6725168333);
+	h_eff_phi_good->SetBinContent(96,0.9329755833);
+	h_eff_phi_good->SetBinContent(102,0.9368261389);
+	h_eff_phi_good->SetBinContent(117,0.9145758889);
+	h_eff_phi_good->SetBinContent(127,0.948701);
+	h_eff_phi_good->SetBinContent(139,0.9257730556);
+	h_eff_phi_good->SetBinContent(147,0.9549523611);
+	h_eff_phi_good->SetBinContent(157,0.9501166667);
+
+
+    h_eff_eta_good->SetBinContent(67, 0.9551121167); 
+    h_eff_eta_good->SetBinContent(68, 0.9426124222); 
+    h_eff_eta_good->SetBinContent(57, 0.9613561278) ; 
+    h_eff_eta_good->SetBinContent(48, 0.9582207667); 
+    h_eff_eta_good->SetBinContent(29, 0.9488718556); 
+    h_eff_eta_good->SetBinContent(6, 0.9508530722); 
+    h_eff_eta_good->SetBinContent(9, 0.9484674444); 
+    h_eff_eta_good->SetBinContent(97, 0.957621); 
+    h_eff_eta_good->SetBinContent(106, 0.9624483333); 
+    h_eff_eta_good->SetBinContent(119, 0.9527053167); 
+    h_eff_eta_good->SetBinContent(127, 0.95554915); 
+    h_eff_eta_good->SetBinContent(136, 0.9600568929); 
+    h_eff_eta_good->SetBinContent(146, 0.9626569048); 
+    h_eff_eta_good->SetBinContent(148, 0.9567193833); 
+    h_eff_eta_good->SetBinContent(82, 0.8572789889); 
+    h_eff_eta_good->SetBinContent(64, 0.9511558778); 
+    h_eff_eta_good->SetBinContent(31, 0.951617122); 
+    h_eff_eta_good->SetBinContent(32, 0.9655316071); 
+    h_eff_eta_good->SetBinContent(22, 0.9696598556); 
+    h_eff_eta_good->SetBinContent(93, 0.9637039444); 
+    h_eff_eta_good->SetBinContent(103, 0.9386933944); 
+    h_eff_eta_good->SetBinContent(134, 0.9713682444); 
+    h_eff_eta_good->SetBinContent(142, 0.9606662444) ; 
+    h_eff_eta_good->SetBinContent(152, 0.9561088944); 
+    h_eff_eta_good->SetBinContent(153, 0.9589092056); 
+    h_eff_eta_good->SetBinContent(162, 0.96344795); 
+
 
 
 //update eff per layer by taking out stuck-bit groups and only averaging over channels 50-180 
-    for(UInt_t i=0; i<binVector.size(); ++i)
+/*    for(UInt_t i=0; i<binVector.size(); ++i)
 	{
 		h_eff_eta_good->SetBinContent(binVector[i], effVector[i]);
 	}
+*/
 
 
 /*	for(UInt_t i=0; i<normalLayersEff.size(); ++i)
@@ -696,12 +728,12 @@ Fill(hit_pstrip->at(i), fillnumber, 1);
       for(UInt_t j=0; j<n_trkperchl[i].size(); ++j) {
          for(UInt_t k=0; k<n_trkperchl[i][j].size(); ++k) {
 
-		for(UInt_t m=0; m<secPhi.size(); ++m)
+/*		for(UInt_t m=0; m<secPhi.size(); ++m)
 		{
 			if(secPhi[m]==i && layerPhi[m]==j && channelPhi[m]==k)
 				--n_trkperchl[i][j][k];
 		}
-
+*/
 
             if( h2_eff_channel->GetBinContent( k+2, (i+1)*5+j+1 )!=0 ) {
                Double_t bincontent = h2_eff_channel->GetBinContent( k+2, (i+1)*5+j+1 );
@@ -739,13 +771,15 @@ Fill(hit_pstrip->at(i), fillnumber, 1);
 }
 */
 
-	UInt_t i=3;
+
+/*	UInt_t i=3;
 	UInt_t j=3; 
 
          for(UInt_t k=0; k<=48; ++k) {
 		cout << k <<"	" << h2_eff_channel->GetBinContent( k+2, (i+1)*5+j+1 ) << endl; 
 		
 	}
+*/
 
 
 
