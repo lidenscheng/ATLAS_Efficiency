@@ -601,6 +601,7 @@ Fill(hit_pstrip->at(i), fillnumber, 1);
 
          if (!myhist)
          {
+//          	myhist = new TH1F(histoname, histoname, 100, 0., 4000000.);
           	myhist = new TH1F(histoname, histoname, 100, 0., 6000000.);
 //          myhist = new TH1F(histoname, histoname, 100, 0., 3300000.);
           	HList->Add(myhist);
@@ -699,6 +700,16 @@ Fill(hit_pstrip->at(i), fillnumber, 1);
     h_eff_eta_good->SetBinContent(152, 0.9561088944); 
     h_eff_eta_good->SetBinContent(153, 0.9589092056); 
     h_eff_eta_good->SetBinContent(162, 0.96344795); 
+
+
+
+   for(UInt_t i=0; i<n_trkpersec.size(); ++i) 
+	{ 
+      for(UInt_t j=0; j<4; ++j) 
+		{
+			cout << (i+1)*5+j+1 <<"	" << h_eff_phi_good->GetBinContent((i+1)*5+j+1) << "	" << h_eff_eta_good->GetBinContent((i+1)*5+j+1) << endl;
+		}
+	}
 
 
 
